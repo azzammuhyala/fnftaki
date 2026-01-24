@@ -1,0 +1,8 @@
+{
+    "version": "1.0.0",
+    "name": "Feel The Range",
+    "music": "music.ogg",
+    "taki_vocal": "voices-taki.ogg",
+    "fever_vocal": "voices-fever-demon.ogg",
+    "chart": "chart.json"
+}

@@ -1,0 +1,7 @@
+{
+    "version": "1.0.0",
+    "name": "Bad Nun",
+    "music": "music.ogg",
+    "vocal": "voices.ogg",
+    "chart": "chart.json"
+}
