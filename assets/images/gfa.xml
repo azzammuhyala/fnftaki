@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="gfa.png">
+<SubTexture name="gfa dancing beat0000" x="0" y="2673" width="702" height="654" frameX="-1" frameY="-18" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0001" x="702" y="2673" width="703" height="654" frameX="0" frameY="-18" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0002" x="1405" y="2673" width="703" height="653" frameX="0" frameY="-19" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0003" x="2800" y="655" width="699" height="653" frameX="-1" frameY="-19" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0004" x="1406" y="2011" width="700" height="655" frameX="-1" frameY="-17" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0005" x="2800" y="0" width="699" height="655" frameX="-1" frameY="-17" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0006" x="2098" y="1323" width="700" height="660" frameX="-1" frameY="-12" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0007" x="1399" y="672" width="699" height="671" frameX="-1" frameY="-1" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0008" x="1399" y="672" width="699" height="671" frameX="0" frameY="0" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0009" x="1399" y="672" width="699" height="671" frameX="0" frameY="0" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0010" x="0" y="0" width="699" height="672" frameX="-1" frameY="0" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0011" x="0" y="0" width="699" height="672" frameX="0" frameY="0" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0012" x="0" y="0" width="699" height="672" frameX="0" frameY="0" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0013" x="699" y="0" width="700" height="672" frameX="-1" frameY="0" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0014" x="699" y="0" width="700" height="672" frameX="0" frameY="0" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0015" x="2098" y="0" width="702" height="662" frameX="-1" frameY="-10" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0016" x="0" y="2011" width="703" height="662" frameX="0" frameY="-10" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0017" x="703" y="2011" width="703" height="661" frameX="0" frameY="-11" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0018" x="2098" y="662" width="699" height="661" frameX="-1" frameY="-11" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0019" x="699" y="1344" width="699" height="664" frameX="-1" frameY="-8" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0020" x="1398" y="1344" width="700" height="664" frameX="-1" frameY="-8" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0021" x="0" y="1344" width="699" height="667" frameX="-1" frameY="-5" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0022" x="0" y="672" width="700" height="672" frameX="-1" frameY="0" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0023" x="0" y="672" width="700" height="672" frameX="0" frameY="0" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0024" x="0" y="672" width="700" height="672" frameX="0" frameY="0" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0025" x="700" y="672" width="699" height="672" frameX="-1" frameY="0" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0026" x="700" y="672" width="699" height="672" frameX="0" frameY="0" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0027" x="700" y="672" width="699" height="672" frameX="0" frameY="0" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0028" x="1399" y="0" width="699" height="672" frameX="-1" frameY="0" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa dancing beat0029" x="1399" y="0" width="699" height="672" frameX="0" frameY="0" frameWidth="703" frameHeight="672" />
+<SubTexture name="gfa fear0000" x="2121" y="1987" width="699" height="667" pivotX="147.15" pivotY="328.65"/>
+<SubTexture name="gfa fear0001" x="2157" y="2653" width="699" height="667"/>
+</TextureAtlas>
