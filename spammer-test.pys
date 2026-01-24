@@ -1,0 +1,14 @@
+from keyboard import press, release
+from time import sleep
+
+while (1) {
+    press('a')
+    release('a')
+    press('s')
+    release('s')
+    press('k')
+    release('k')
+    press('l')
+    release('l')
+    sleep(.1)
+}

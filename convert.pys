@@ -1,0 +1,44 @@
+import json
+import pprint
+import sys
+
+# Convert a default chart from Psych FNF Egine (i guess it's from Psych) to simple a chart
+
+RESULT_PATH = r'songs\bad-nun\chart.json'
+CHART_PATH = r'songs\bad-nun\bad-nun-hard.json'
+
+data = json.load(open(CHART_PATH, 'r'))
+totalSection = len(data['song']['notes'])
+
+result = []
+
+for (i, notes of enumerate(data['song']['notes'], start=1)) {
+
+    for (note of notes['sectionNotes']) {
+        time = note[0]
+        idDirection = note[1]
+        length = note[2]
+
+        if !(0 <= idDirection <= 7) {
+            print('Skipped note', i, 'with direction ID', idDirection)
+            continue
+        }
+
+        if notes['mustHitSection']
+            result.append({
+                't': time,
+                'd': idDirection,
+                'l': length
+            })
+        else
+            result.append({
+                't': time,
+                'd': idDirection<4 ? idDirection+4 : idDirection-4,
+                'l': length
+            })
+    }
+
+    print(i, 'of', totalSection, 'sections')
+}
+
+json.dump(result, open(RESULT_PATH, 'w'))
