@@ -27,6 +27,10 @@ from json import load
 SONG_NAME = 'crucify'
 # You can change the notes speed here:
 NOTES_SPEED = 1
+# If you using on mobile (Pyramide or Pydroid 3) change this to true:
+MOBILE = false
+# If you want fullscreen:
+FULLSCREEN = false
 
 # You also can change the keys binding here:
 KEYS_BINDING = {
@@ -62,13 +66,36 @@ NOTES_OFFSET = {
     right: 3
 }
 
+BUTTON_INFO = [
+    {
+        direction: 'left',
+        key: pygame.K_LEFT,
+        color: (128, 0, 128, 60)
+    },
+    {
+        direction: 'down',
+        key: pygame.K_DOWN,
+        color: (0, 0, 255, 60)
+    },
+    {
+        direction: 'up',
+        key: pygame.K_UP,
+        color: (0, 255, 0, 60)
+    },
+    {
+        direction: 'right',
+        key: pygame.K_RIGHT,
+        color: (255, 0, 0, 60)
+    }
+]
+
 NOTES_BUFFER_RANGE = 1_000
 NOTES_PRESSED_RANGE = 150
 CHANGE_TO_IDLE = 500
 SPRITE_SPEED = 50
 
 NOTES_BUFFER_RANGE = max(NOTES_BUFFER_RANGE, int(NOTES_BUFFER_RANGE * NOTES_SPEED))
-NOTES_PRESSED_RANGE = max(NOTES_PRESSED_RANGE, int(NOTES_PRESSED_RANGE * NOTES_SPEED))
+NOTES_PRESSED_RANGE = int(NOTES_PRESSED_RANGE * NOTES_SPEED)
 
 func loadImage(path)
     return pygame.image.load(path).convert_alpha()
@@ -195,10 +222,9 @@ class Character {
         self.data = data
         self.hasOwnNote = hasOwnNote
 
-        self.animation = AnimatedSprite(data.sprites.idle, SPRITE_SPEED)
-
+        self.character = AnimatedSprite(data.sprites.idle, SPRITE_SPEED)
         if (hasOwnNote)
-            self.noteAnimations = {
+            self.notes = {
                 left: AnimatedSprite(data.sprites.note_left, SPRITE_SPEED),
                 down: AnimatedSprite(data.sprites.note_down, SPRITE_SPEED),
                 up: AnimatedSprite(data.sprites.note_up, SPRITE_SPEED),
@@ -216,9 +242,9 @@ class Character {
         self.states.add(name)
         changeNote = true
         if (missed)
-            self.animation.sprites = self.data.sprites[(changeNote := success) ? name : name + 'Miss']
+            self.character.sprites = self.data.sprites[(changeNote := success) ? name : name + 'Miss']
         if (self.hasOwnNote && changeNote)
-            self.noteAnimations[name].sprites = self.data.sprites['note_' + name + (success ? 'Confirm' : 'Press')]
+            self.notes[name].sprites = self.data.sprites['note_' + name + (success ? 'Confirm' : 'Press')]
     }
 
     func release(self, name) {
@@ -226,7 +252,7 @@ class Character {
             return;
         self.states.discard(name)
         if (self.hasOwnNote)
-            self.noteAnimations[name].sprites = self.data.sprites['note_' + name]
+            self.notes[name].sprites = self.data.sprites['note_' + name]
         if (!self.states) {
             self.timeToIdle = pygame.time.get_ticks() + CHANGE_TO_IDLE
             self.changeIdle = true
@@ -235,18 +261,18 @@ class Character {
 
     func update(self, deltaTime) {
         if (self.changeIdle && !self.states && pygame.time.get_ticks() >= self.timeToIdle) {
-            self.animation.sprites = self.data.sprites.idle
+            self.character.sprites = self.data.sprites.idle
             self.changeIdle = false
         }
 
-        self.animation.update(deltaTime)
+        self.character.update(deltaTime)
         if (self.hasOwnNote)
-            for (note of dict.values(self.noteAnimations))
+            for (note of dict.values(self.notes))
                 note.update(deltaTime)
     }
 
     func draw(self, screen) {
-        character = self.animation.getCurrentSprite()
+        character = self.character.getCurrentSprite()
         screen.blit(character, character.get_rect(midbottom=self.data.position))
     }
 
@@ -259,10 +285,33 @@ class Game {
 
         pygame.display.set_caption('Loading...')
 
-        self.screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE | pygame.SCALED)
+        self.screen = pygame.display.set_mode(
+            (1280, 720),
+            pygame.RESIZABLE | pygame.SCALED | (FULLSCREEN ? pygame.FULLSCREEN : 0)
+        )
+
         self.running = true
 
         pygame.display.set_icon(loadImage('assets/images/icon.png'))
+
+        if (MOBILE) {
+            scx, scy = self.screen.get_size()
+            buttonWidth = scx // 4
+            buttonHeight = scy
+
+            self.touchButton = []
+            self.noteSurface = pygame.Surface((scx, scy), pygame.SRCALPHA)
+
+            for (i of range(4)) {
+                rect = pygame.Rect(i * buttonWidth, scy - buttonHeight, buttonWidth, buttonHeight)
+
+                surface = pygame.Surface((buttonWidth, buttonHeight), pygame.SRCALPHA)
+                surface.fill(BUTTON_INFO[i].color)
+
+                self.noteSurface.blit(surface, rect)
+                self.touchButton.append(rect)
+            }
+        }
 
         self.metadata = jsdict(loadJSON(os.path.join(modpath, 'metadata.json')))
 
@@ -276,11 +325,9 @@ class Game {
         fever = loadImage('assets/images/demon-fever.png')
         note = loadImage('assets/images/note.png')
 
-        scale = 0.6
+        characterScale = 0.6
         gfaScale = 0.5
         noteScale = 0.7
-
-        self.font = pygame.font.SysFont('Arial', 30)
 
         self.background = pygame.transform.smoothscale(
             loadImage('assets/images/background.png'),
@@ -323,11 +370,11 @@ class Game {
             notesPosition: [100, 100],
             directionXNotesPosition: 1,
             sprites: {
-                down: splitSpriteSheet(taki, takiXML, 'taki down', scale),
-                idle: splitSpriteSheet(taki, takiXML, 'taki idle', scale),
-                left: splitSpriteSheet(taki, takiXML, 'taki left', scale),
-                right: splitSpriteSheet(taki, takiXML, 'taki right', scale),
-                up: splitSpriteSheet(taki, takiXML, 'taki up', scale)
+                down: splitSpriteSheet(taki, takiXML, 'taki down', characterScale),
+                idle: splitSpriteSheet(taki, takiXML, 'taki idle', characterScale),
+                left: splitSpriteSheet(taki, takiXML, 'taki left', characterScale),
+                right: splitSpriteSheet(taki, takiXML, 'taki right', characterScale),
+                up: splitSpriteSheet(taki, takiXML, 'taki up', characterScale)
             } | self.spritesNote
         })
 
@@ -337,15 +384,15 @@ class Game {
             notesPosition: (850, 100),
             voiceMiss: pygame.mixer.Sound('assets/sounds/miss.mp3'),
             sprites: {
-                down: splitSpriteSheet(fever, feverXML, 'fever down', scale),
-                downMiss: splitSpriteSheet(fever, feverXML, 'fever down miss', scale),
-                idle: splitSpriteSheet(fever, feverXML, 'fever idle', scale),
-                left: splitSpriteSheet(fever, feverXML, 'fever left', scale),
-                leftMiss: splitSpriteSheet(fever, feverXML, 'fever left miss', scale),
-                right: splitSpriteSheet(fever, feverXML, 'fever right', scale),
-                rightMiss: splitSpriteSheet(fever, feverXML, 'fever right miss', scale),
-                up: splitSpriteSheet(fever, feverXML, 'fever up', scale),
-                upMiss: splitSpriteSheet(fever, feverXML, 'fever up miss', scale)
+                down: splitSpriteSheet(fever, feverXML, 'fever down', characterScale),
+                downMiss: splitSpriteSheet(fever, feverXML, 'fever down miss', characterScale),
+                idle: splitSpriteSheet(fever, feverXML, 'fever idle', characterScale),
+                left: splitSpriteSheet(fever, feverXML, 'fever left', characterScale),
+                leftMiss: splitSpriteSheet(fever, feverXML, 'fever left miss', characterScale),
+                right: splitSpriteSheet(fever, feverXML, 'fever right', characterScale),
+                rightMiss: splitSpriteSheet(fever, feverXML, 'fever right miss', characterScale),
+                up: splitSpriteSheet(fever, feverXML, 'fever up', characterScale),
+                upMiss: splitSpriteSheet(fever, feverXML, 'fever up miss', characterScale)
             } | self.spritesNote
         })
 
@@ -358,11 +405,12 @@ class Game {
             }
         }, hasOwnNote=false)
 
+        self.font = pygame.font.SysFont('Arial', 30)
+
         pygame.mixer.music.load(os.path.join(modpath, self.metadata.music))
 
         if (self.metadata.vocal is not none) {
             self.voice = pygame.mixer.Sound(os.path.join(modpath, self.metadata.vocal))
-
             self.voice.set_volume(1)
 
             self.playMusic = func() {
@@ -402,6 +450,61 @@ class Game {
         pygame.mixer.music.set_volume(1)
     }
 
+    func playerPress(self, key, currentTime) {
+        key = KEYS_BINDING[key]
+
+        for (note of self.bufferNotes) {
+            if (
+                !note.pressed &&
+                note.time - NOTES_PRESSED_RANGE < currentTime < note.time + NOTES_PRESSED_RANGE &&
+                note.character == 'fever' && note.direction == key
+            ) {
+                note.pressed = true
+                note.pressing = true
+                note.pressTime = currentTime
+                self.activeNotes.append(note)
+                self.fever.hit(key, success=true)
+                break
+            }
+        }
+        else {
+            self.fever.hit(key, success=false, missed=false)
+        }
+    }
+
+    func playerRelease(self, key, currentTime) {
+        key = KEYS_BINDING[key]
+
+        for (i, note of enumerate(self.activeNotes)) {
+            if (note.direction == key) {
+                self.activeNotes.pop(i)
+                note.pressing = false
+
+                if (note.pressed && note.length is not none && note.end >= currentTime) {
+                    note.pressed = false
+                    break
+                }
+
+                self.combo += 1
+                self.maxCombo = max(self.maxCombo, self.combo)
+
+                score = 1 - abs(note.pressTime - note.time) / NOTES_PRESSED_RANGE
+
+                self.score += int(50 * score)
+                self.scoreLabel = match {
+                    score >= 0.8: 'sick',
+                    score >= 0.6: 'good',
+                    score >= 0.3: 'ok',
+                    default: 'shit'
+                }
+
+                break
+            }
+        }
+
+        self.fever.release(key)
+    }
+
     func removeDeprecatedNoteBuffer(self, currentTime) {
         if (self.bufferNotes && self.bufferNotes[0].end < currentTime - NOTES_BUFFER_RANGE)
             self.bufferNotes.pop(0)
@@ -423,6 +526,7 @@ class Game {
     func run(self) {
         pygame.display.set_caption(self.metadata.name)
 
+        scx, scy = self.screen.get_size()
         self.clock = pygame.time.Clock()
 
         self.playMusic()
@@ -437,65 +541,30 @@ class Game {
                     self.running = false
 
                 elif (event.type == pygame.KEYDOWN) {
-
-                    if (event.key -> KEYS_BINDING) {
-                        key = KEYS_BINDING[event.key]
-
-                        for (note of self.bufferNotes) {
-                            if (
-                                note.time - NOTES_PRESSED_RANGE < currentTime < note.time + NOTES_PRESSED_RANGE &&
-                                note.character == 'fever' && note.direction == key
-                            ) {
-                                note.pressed = true
-                                note.pressing = true
-                                note.pressTime = currentTime
-                                self.activeNotes.append(note)
-                                self.fever.hit(key, success=true)
-                                break
-                            }
-                        }
-                        else {
-                            self.fever.hit(key, success=false, missed=false)
-                        }
-                    }
+                    if (event.key -> KEYS_BINDING)
+                        self.playerPress(event.key, currentTime)
                 }
 
                 elif (event.type == pygame.KEYUP) {
-
-                    if (event.key -> KEYS_BINDING) {
-                        key = KEYS_BINDING[event.key]
-
-                        for (i, note of enumerate(self.activeNotes)) {
-                            if (note.direction == key) {
-                                self.activeNotes.pop(i)
-                                note.pressing = false
-
-                                if (note.length is not none && note.end >= currentTime) {
-                                    note.pressed = false
-                                    break
-                                }
-
-                                self.combo += 1
-                                self.maxCombo = max(self.maxCombo, self.combo)
-
-                                score = 1 - abs(note.pressTime - note.time) / NOTES_PRESSED_RANGE
-
-                                self.score += int(50 * score)
-                                self.scoreLabel = match {
-                                    score >= 0.8: 'sick',
-                                    score >= 0.6: 'good',
-                                    score >= 0.3: 'ok',
-                                    default: 'shit'
-                                }
-
-                                break
-                            }
-                        }
-
-                        self.fever.release(key)
-                    }
+                    if (event.key -> KEYS_BINDING)
+                        self.playerRelease(event.key, currentTime)
                 }
 
+                elif (MOBILE && event.type == pygame.FINGERDOWN) {
+                    touchX = event.x * scx
+                    touchY = event.y * scy
+                    for (i, rect of enumerate(self.touchButton))
+                        if (rect.collidepoint(touchX, touchY))
+                            self.playerPress(BUTTON_INFO[i].key, currentTime)
+                }
+
+                elif (MOBILE && event.type == pygame.FINGERUP) {
+                    touchX = event.x * scx
+                    touchY = event.y * scy
+                    for (i, rect of enumerate(self.touchButton))
+                        if (rect.collidepoint(touchX, touchY))
+                            self.playerRelease(BUTTON_INFO[i].key, currentTime)
+                }
             }
 
             self.gfa.update(deltaTime)
@@ -508,12 +577,14 @@ class Game {
             self.taki.draw(self.screen)
             self.fever.draw(self.screen)
 
+            if (MOBILE)
+                self.screen.blit(self.noteSurface, (0, 0))
+
             takiNotesRect = []
             feverNotesRect = []
 
             self.taki.data.notesPosition[0] += int(80 * deltaTime / 1000) * self.taki.data.directionXNotesPosition
 
-            scx, scy = self.screen.get_size()
             tx, ty = self.taki.data.notesPosition
             fx, fy = self.fever.data.notesPosition
 
@@ -524,8 +595,8 @@ class Game {
 
             for (i, (takiNote, feverNote) of enumerate(
                 zip(
-                    dict.values(self.taki.noteAnimations),
-                    dict.values(self.fever.noteAnimations)
+                    dict.values(self.taki.notes),
+                    dict.values(self.fever.notes)
                 )
             )) {
                 takiSurface = takiNote.getCurrentSprite()
@@ -550,7 +621,7 @@ class Game {
 
                     if (character == 'taki') {
                         noteRect = takiNotesRect[offset]
-                        sy = ty + start - currentTime
+                        sy = ty + start - currentTime - noteRect.height // 2
 
                         if (note.length is not none) {
                             piece = self.spritesNote[noteName + 'HoldPiece']
@@ -584,7 +655,7 @@ class Game {
 
                     else {
                         noteRect = feverNotesRect[offset]
-                        sy = ty + start - currentTime
+                        sy = ty + start - currentTime - noteRect.height // 2
 
                         if (note.length is not none) {
                             piece = self.spritesNote[noteName + 'HoldPiece']
@@ -670,7 +741,6 @@ class Game {
             )
 
             self.screen.blit(label, ((scx - label.get_width()) // 2, scy - label.get_height() - 10))
-
             pygame.display.flip()
         }
 

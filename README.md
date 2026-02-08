@@ -1,6 +1,6 @@
 # FNF Mod - Friday Night Fever - only with Taki and Demon Fever!!
 I just made Taki VS Demon Fever using PyScript and PyGame library. This game is quite simple, with only four songs and
-is ready to play without a main menu. If your device is quite low-end, i'm sure you won't even be able to reach 10 FPS
+is ready to play without a main menu. If your device is quite low-end, i'm sure you won't even be able to reach 24 FPS
 lol. PyScript runs on top of Python, which is quite slow and heavy for that.
 
 ## Requirements

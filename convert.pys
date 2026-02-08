@@ -7,12 +7,14 @@ import sys
 RESULT_PATH = r'songs\bad-nun\chart.json'
 CHART_PATH = r'songs\bad-nun\bad-nun-hard.json'
 
-data = json.load(open(CHART_PATH, 'r'))
-totalSection = len(data['song']['notes'])
+dataChart = json.load(open(CHART_PATH, 'r'))
+
+sections = dataChart['song']['notes']
+totalSections = len(sections)
 
 result = []
 
-for (i, notes of enumerate(data['song']['notes'], start=1)) {
+for (i, notes of enumerate(sections, start=1)) {
 
     for (note of notes['sectionNotes']) {
         time = note[0]
@@ -38,7 +40,7 @@ for (i, notes of enumerate(data['song']['notes'], start=1)) {
             })
     }
 
-    print(i, 'of', totalSection, 'sections')
+    print(i, 'of', totalSections, 'sections')
 }
 
 json.dump(result, open(RESULT_PATH, 'w'))

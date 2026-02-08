@@ -1,4 +1,4 @@
-from keyboard import press, release
+from keyboard import press, release # pip install keyboard
 from time import sleep
 
 while (1) {
