@@ -14,4 +14,5 @@ Execute this command (run the file `main.py` with pyscript `interpreter`):
 python -m pyscript main.py
 ```
 
-> Read the comment header in `main.py` file first!
+
+> Read the comment header in `main.pys` file first!
