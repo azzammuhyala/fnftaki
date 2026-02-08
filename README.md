@@ -9,10 +9,9 @@ lol. PyScript runs on top of Python, which is quite slow and heavy for that.
 - PyGame `pip install pygame` or `pip install pygame-ce`
 
 ## Run
-Execute this command (run the file `main.py` with pyscript `interpreter`):
+Execute this command (run the file `main.pys` with pyscript `interpreter`):
 ```sh
-python -m pyscript main.py
+python -m pyscript main.pys
 ```
-
 
 > Read the comment header in `main.pys` file first!
