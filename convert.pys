@@ -1,11 +1,9 @@
-import json
-import pprint
-import sys
-
 # Convert a default chart from Psych FNF Egine (i guess it's from Psych) to simple a chart
 
-RESULT_PATH = r'songs\bad-nun\chart.json'
-CHART_PATH = r'songs\bad-nun\bad-nun-hard.json'
+import json
+
+RESULT_PATH = r'songs\monochrome\chart.json'
+CHART_PATH = r'songs\monochrome\monochrome.json'
 
 dataChart = json.load(open(CHART_PATH, 'r'))
 

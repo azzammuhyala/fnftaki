@@ -1,6 +1,7 @@
-# source mod: https://gamebanana.com/mods/615737, https://gamebanana.com/mods/425462 (Bad Nun)
+# source mod: https://gamebanana.com/mods/615737, https://gamebanana.com/mods/425462 (Bad Nun),
+#             https://gamebanana.com/mods/332345 and https://www.youtube.com/watch?v=vqZWYbdyr1U (Lullaby - Monochrome)
 # license mod: Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License.
-# credit mod: Chewilly11, CesarFever, TieGuo (Bad Nun)
+# credit mod: Chewilly11, CesarFever, TieGuo (Bad Nun), RuvStyle (Monochrome - Taki)
 
 # source code: https://github.com/azzammuhyala/fnftaki
 # license code: MIT
@@ -9,7 +10,7 @@
 # GAME: All FNF vs Taki from Friday Night Fever writen using PyScript (A new programming language) with no fnf egine
 # See more about PyScript here: https://github.com/azzammuhyala/pyscript
 
-# Available songs: 'bad-nun', 'bazinga', 'crucify', and 'feel-the-range'
+# Available songs: 'bad-nun', 'bazinga', 'crucify', and 'feel-the-range', 'monochrome' (NEW)
 
 # ------------------------------------------------------- CODE ------------------------------------------------------- #
 
@@ -27,6 +28,8 @@ from json import load
 SONG_NAME = 'crucify'
 # You can change the notes speed here:
 NOTES_SPEED = 1
+# Set maximum FPS:
+FPS = 60
 # If you using on mobile (Pyramide or Pydroid 3) change this to true:
 MOBILE = false
 # If you want fullscreen:
@@ -205,7 +208,7 @@ class AnimatedSprite {
     func update(self, deltaTime) {
         self.timeAccumulator += deltaTime
         if (self.timeAccumulator >= self.frameDuration) {
-            self.timeAccumulator -= self.frameDuration
+            self.timeAccumulator = 0
             self.currentIndex = (self.currentIndex + 1) % len(self._sprites)
         }
     }
@@ -529,10 +532,12 @@ class Game {
         scx, scy = self.screen.get_size()
         self.clock = pygame.time.Clock()
 
+        print('Now playing {} with {}x notes speed...'.format(self.metadata.name, NOTES_SPEED))
+
         self.playMusic()
 
         while (self.running && pygame.mixer.music.get_busy()) {
-            deltaTime = self.clock.tick(60)
+            deltaTime = self.clock.tick(FPS)
             currentTime = int(pygame.mixer.music.get_pos() * NOTES_SPEED)
 
             for (event of pygame.event.get()) {
@@ -749,4 +754,10 @@ class Game {
 }
 
 if (__name__ == '__main__')
-    Game(os.path.join('songs', SONG_NAME.strip().lower())).run()
+    Game(
+        os.path.join(
+            'assets',
+            'songs',
+            SONG_NAME.strip().lower()
+        )
+    ).run()
