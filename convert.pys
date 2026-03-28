@@ -1,44 +1,69 @@
 # Convert a default chart from Psych FNF Egine (i guess it's from Psych) to simple a chart
 
 import json
+import re
 
-RESULT_PATH = r'songs\monochrome\chart.json'
-CHART_PATH = r'songs\monochrome\monochrome.json'
+RESULT_PATH = r'assets\songs\floccinaucinihilipilificatiophobia\chart.json'
+CHART_PATH = r'assets\songs\floccinaucinihilipilificatiophobia\hard.json'
 
-dataChart = json.load(open(CHART_PATH, 'r'))
+func converter(fn) {
+    with (open(CHART_PATH, 'r') as file)
+        dataChart = json.load(file)
 
-sections = dataChart['song']['notes']
-totalSections = len(sections)
+    sections = dataChart['song']['notes']
+    totalSections = len(sections)
 
-result = []
+    result = []
 
-for (i, notes of enumerate(sections, start=1)) {
+    for (i, notes of enumerate(sections, start=1)) {
 
-    for (note of notes['sectionNotes']) {
-        time = note[0]
-        idDirection = note[1]
-        length = note[2]
+        sectionNotes = notes['sectionNotes']
+        totalNotes = len(sectionNotes)
 
-        if !(0 <= idDirection <= 7) {
-            print('Skipped note', i, 'with direction ID', idDirection)
-            continue
+        for (j, note of enumerate(sectionNotes, start=1)) {
+            time = note[0]
+            idDirection = note[1]
+            length = note[2]
+
+            if (!(isinstance(idDirection, int) && 0 <= idDirection <= 7)) {
+                print('Skipped note', j, 'with direction ID', repr(idDirection))
+                continue
+            }
+
+            if (notes['mustHitSection']) {
+                result.append({
+                    'd': idDirection,
+                    't': time,
+                    'l': length
+                })
+            } else {
+                result.append({
+                    'd': idDirection<4 ? idDirection+4 : idDirection-4,
+                    't': time,
+                    'l': length
+                })
+            }
+
+            print(j, 'of', totalNotes, 'notes from the', '%i/%i' % (i, totalSections), 'section order')
         }
 
-        if notes['mustHitSection']
-            result.append({
-                't': time,
-                'd': idDirection,
-                'l': length
-            })
-        else
-            result.append({
-                't': time,
-                'd': idDirection<4 ? idDirection+4 : idDirection-4,
-                'l': length
-            })
+        print(i, 'of', totalSections, 'sections')
     }
 
-    print(i, 'of', totalSections, 'sections')
+    with (open(RESULT_PATH, 'w') as file)
+        file.write(fn(result))
 }
 
-json.dump(result, open(RESULT_PATH, 'w'))
+# converter(func(result) {
+#     return re.sub(r'\s+', '', json.dumps(result))
+# })
+
+converter(func(result) {
+    return '\n'.join(comprehension(result, func(note) {
+        data = [note['d'], note['t']]
+        l = note['l']
+        if (l is not None and l > 0):
+            data.append(l)
+        return ','.join(map(repr, data))
+    }))
+})

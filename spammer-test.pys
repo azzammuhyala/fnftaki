@@ -10,5 +10,5 @@ while (1) {
     release('w')
     press('d')
     release('d')
-    sleep(.05)
+    sleep(0.05)
 }
