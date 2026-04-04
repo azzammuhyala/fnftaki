@@ -3,8 +3,8 @@
 import json
 import re
 
-RESULT_PATH = r'assets\songs\floccinaucinihilipilificatiophobia\chart.json'
-CHART_PATH = r'assets\songs\floccinaucinihilipilificatiophobia\hard.json'
+CHART_PATH = r'assets\songs\hallow\hallow.json'
+RESULT_PATH = r'assets\songs\hallow\chart.csv'
 
 func converter(fn) {
     with (open(CHART_PATH, 'r') as file)
@@ -14,6 +14,7 @@ func converter(fn) {
     totalSections = len(sections)
 
     result = []
+    notesSet = set()
 
     for (i, notes of enumerate(sections, start=1)) {
 
@@ -21,14 +22,23 @@ func converter(fn) {
         totalNotes = len(sectionNotes)
 
         for (j, note of enumerate(sectionNotes, start=1)) {
-            time = note[0]
+            time = int(note[0])
             idDirection = note[1]
-            length = note[2]
+            length = int(note[2])
 
             if (!(isinstance(idDirection, int) && 0 <= idDirection <= 7)) {
                 print('Skipped note', j, 'with direction ID', repr(idDirection))
                 continue
             }
+
+            note = (idDirection, time)
+
+            if (note in notesSet) {
+                print('Skipped note', j, 'with duplicate note', repr(note))
+                continue
+            }
+
+            notesSet.add(note)
 
             if (notes['mustHitSection']) {
                 result.append({
@@ -62,7 +72,7 @@ converter(func(result) {
     return '\n'.join(comprehension(result, func(note) {
         data = [note['d'], note['t']]
         l = note['l']
-        if (l is not None and l > 0):
+        if (l is not None and l > 0)
             data.append(l)
         return ','.join(map(repr, data))
     }))
