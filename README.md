@@ -4,7 +4,7 @@
     <img src="preview.gif" alt="Preview">
 </div>
 
-I just made Taki VS Demon Fever using PyScript and PyGame library. This game is quite simple, with only seven songs and
+I just made Taki VS Demon Fever using PyScript and PyGame library. This game is quite simple, with only 9 songs and
 is ready to play without a main menu. If your device is quite low-end, i'm sure you won't even be able to reach 24 FPS
 lol. PyScript runs on top of Python, which is quite slow and heavy for that.
 
@@ -22,13 +22,13 @@ python -m pyscript main.pys
 are there)
 
 ### If you're want to play on mobile
-You'll need to install a mobile app that can run Python, PyScript and display the PyGame window. I recommend using
-**PyramIDE** (recommended) or **Pydroid 3**. After that, you'll need to install the required libraries. Once that's done
-and without any issues, copy the Python code below. `GAME_PATH` is the game's folder, which contains the `main.pys` file
-and the `assets` folder required by the game.
+You need to install a mobile app that can run Python, PyScript and display the PyGame window. I recommend using
+**PyramIDE: Python 3 IDE** (recommended) or **Pydroid 3**. After that, you need to install the required libraries.
+Once that's done and without any issues, copy the Python code below. `GAME_PATH` is the game's folder, which contains
+the `main.pys` file and the `assets/` folder required by the game.
 ```py
 # Your game folder:
-GAME_PATH = r'/storage/emulated/0/Download/taki-v1.3'
+GAME_PATH = r'/storage/emulated/0/Download/taki-v1.4'
 
 import os
 

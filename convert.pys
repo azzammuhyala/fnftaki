@@ -1,10 +1,10 @@
-# Convert a default chart from Psych FNF Egine (i guess it's from Psych) to simple a chart
+# Convert a default chart from Psych FNF Egine (i guess it's from Psych) to simple a .csv chart
 
 import json
 import re
 
-CHART_PATH = r'assets\songs\hallow\hallow.json'
-RESULT_PATH = r'assets\songs\hallow\chart.csv'
+CHART_PATH = r'bazinga/bazinga.json'
+RESULT_PATH = r'assets/songs/bazinga-anniversary/chart.csv'
 
 func converter(fn) {
     with (open(CHART_PATH, 'r') as file)
@@ -14,31 +14,35 @@ func converter(fn) {
     totalSections = len(sections)
 
     result = []
-    notesSet = set()
+    notesRegister = set()
 
     for (i, notes of enumerate(sections, start=1)) {
-
         sectionNotes = notes['sectionNotes']
         totalNotes = len(sectionNotes)
 
         for (j, note of enumerate(sectionNotes, start=1)) {
-            time = int(note[0])
             idDirection = note[1]
-            length = int(note[2])
 
             if (!(isinstance(idDirection, int) && 0 <= idDirection <= 7)) {
                 print('Skipped note', j, 'with direction ID', repr(idDirection))
                 continue
             }
 
-            note = (idDirection, time)
+            try {
+                time = int(note[0])
+                length = int(note[2])
+                note = (idDirection, time)
+            } catch (e) {
+                print('An error occurred in', j, ':', e)
+                continue
+            }
 
-            if (note in notesSet) {
+            if (note in notesRegister) {
                 print('Skipped note', j, 'with duplicate note', repr(note))
                 continue
             }
 
-            notesSet.add(note)
+            notesRegister.add(note)
 
             if (notes['mustHitSection']) {
                 result.append({

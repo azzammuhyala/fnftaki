@@ -1,22 +1,27 @@
 # source mod: https://gamebanana.com/mods/615737, https://gamebanana.com/mods/425462 (Bad Nun),
 #             https://gamebanana.com/mods/332345 and
 #             https://www.youtube.com/watch?v=vqZWYbdyr1U (Monochrome - Taki version),
-#             https://gamebanana.com/mods/310465 (Prayer)
+#             https://gamebanana.com/mods/310465 (Prayer),
+#             https://gamebanana.com/mods/336064 (Crucify and Bazinga Anniversary)
 # license mod: Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License.
 # credit mod: Chewilly11, CesarFever, Mako, Tea, Foodieti, isophoro, Rifxii, FPLester, Biddle, BirdBonanza, Roll,
 #             Circle, HyphaeShade, Kip, Winkel, MegaFreedom, Peakek, Vai, Pancho, Della, Vortmite, EMG, Zarrene, Leo,
 #             Wee, TokoTakki, HunniBunnii, Shino, Pierogii, RecD, Flippy, Shelton883, Penkaru, Moopsterino, No-Mi,
 #             Rosamay, Skelly, Tanner, TheCouchPotato170, Viva, Void, Zombie, TieGuo (Bad Nun),
-#             RuvStyle (Monochrome - Taki version)
+#             RuvStyle (Monochrome - Taki version),
+#             MemeMods64 (Crucify and Bazinga Anniversary [Submitter, not the original creator])
 
 # source code: https://github.com/azzammuhyala/fnftaki
 # license code: MIT
 # author code: Azzam Muhyala
 
-# GAME: All FNF vs Taki from Friday Night Fever writen on PyScript (A new programming language) with no fnf egine
-# See more about PyScript here: https://github.com/azzammuhyala/pyscript
+# GAME: All FNF vs Taki from Friday Night Fever writen on PyScript (A new programming language) with no fnf egine.
+#       See more about PyScript here: https://github.com/azzammuhyala/pyscript
+# DISCLAIMER: I do not 100% own any assets such as characters, sounds, music, or song charts in this game.
+#             I only created the my own engine code from scratch. By the way, I'm a fan of Taki!
 
-# Available songs: 'bad-nun', 'bazinga', 'crucify', 'feel-the-range', 'monochrome', 'prayer', 'hallow' (NEW)
+# Available songs: 'bad-nun', 'bazinga', 'crucify', 'feel-the-range', 'monochrome', 'prayer', 'hallow',
+#                  'crucify-anniversary' (NEW), 'bazinga-anniversary' (NEW)
 #                  ('*' for play all songs)
 
 # ------------------------------------------------------- CODE ------------------------------------------------------- #
@@ -26,23 +31,24 @@
 from __future__ import dict2jsdict
 
 import pygame
+import jsdict
+import json
 import math
+import time
 import os
-import 'xml.etree.ElementTree' as xml_element_tree
-from jsdict import jsdict
-from json import load
+import 'xml.etree.ElementTree' as xmlTree
 
-# ----------------------------------------------------- OPTIONS ----------------------------------------------------- #
+# ----------------------------------------------------- OPTIONS! ----------------------------------------------------- #
 
 # You can change the song here according to the available song name:
 SONG_NAME = '*'
 # You can change the notes speed here:
-NOTE_SPEED = 1
+SCROLL_SPEED = 1
 # Set maximum FPS:
 FPS = 60
 # Show debug info:
 SHOW_INFO = false
-# If you using on mobile (PyramIDE or Pydroid 3) change this to true:
+# If you using on mobile ("PyramIDE: Python 3 IDE" or "Pydroid 3") change this to true:
 MOBILE = false
 # If you want fullscreen:
 FULL_SCREEN = false
@@ -112,30 +118,31 @@ BUTTON_INFO = [
 
 RATING_VALUES = {
     'sick': 1.0,
-    'good': 0.9,
-    'bad': 0.8,
-    'shit': 0.7
+    'good': 0.8,
+    'bad': 0.6,
+    'shit': 0.4
 }
 
 GAME_RESOLUTION = (1280, 720)
-NOTES_PRESSED_RANGE = 200
+NOTES_PRESSED_RANGE = 150
 NOTES_LENGTH_RANGE = 100
 CHANGE_TO_IDLE = 500
 SPRITE_SPEED = 50
 SWING_DISTANCE = 15
+SCORE_VALUE = 100
 
-NOTES_LENGTH_RANGE = int(NOTES_LENGTH_RANGE * NOTE_SPEED)
-NOTES_PRESSED_RANGE = int(NOTES_PRESSED_RANGE * NOTE_SPEED)
+NOTES_LENGTH_RANGE = int(NOTES_LENGTH_RANGE * SCROLL_SPEED)
+NOTES_PRESSED_RANGE = int(NOTES_PRESSED_RANGE * SCROLL_SPEED)
 
 func loadImage(path)
     return pygame.image.load(path).convert_alpha()
 
 func loadXML(path)
-    return xml_element_tree.parse(path).getroot()
+    return xmlTree.parse(path).getroot()
 
 func loadJSON(path)
     with (open(path, 'r') as file)
-        return load(file)
+        return json.load(file)
 
 func splitSpriteSheet(surface, root, nameId, scale=1, isSpriteAnimation=true) {
     frames = []
@@ -187,7 +194,7 @@ func splitSpriteSheet(surface, root, nameId, scale=1, isSpriteAnimation=true) {
 }
 
 func createNotes(notes) {
-    NOTE_SPEED = NOTE_SPEED
+    SCROLL_SPEED = SCROLL_SPEED
     NOTES_ID = NOTES_ID
     print = print
     len = len
@@ -203,9 +210,9 @@ func createNotes(notes) {
 
                 note = note.strip().split(',')
                 character, direction = NOTES_ID[int(note[0])].split()
-                time = int(int(note[1]) * NOTE_SPEED)
+                time = int(int(note[1]) * SCROLL_SPEED)
                 length = int(note[2]) if len(note) == 3 else none
-                length = length is none || length <= 0 ? none : int(length * NOTE_SPEED)
+                length = length is none || length <= 0 ? none : int(length * SCROLL_SPEED)
 
                 return {
                     character: character,
@@ -229,7 +236,7 @@ func renderWithLine(fontRender, text, color, backgroundColor=none) {
     surfaces = []
     width = height = 0
 
-    for (line in text.split('\n')) {
+    for (line of text.split('\n')) {
         surface = fontRender(line, true, color)
         w, h = surface.get_size()
         width = max(width, w)
@@ -243,7 +250,7 @@ func renderWithLine(fontRender, text, color, backgroundColor=none) {
     if (backgroundColor is not none)
         surface.fill(backgroundColor)
 
-    for (surf in surfaces) {
+    for (surf of surfaces) {
         surface.blit(surf, (0, y))
         y += surf.get_height()
     }
@@ -252,15 +259,13 @@ func renderWithLine(fontRender, text, color, backgroundColor=none) {
 }
 
 func getFormatTime(currentTime) {
-    total_ms = currentTime
-
-    minutes = total_ms // 60000
-    remaining_ms = total_ms % 60000
-
-    seconds = remaining_ms // 1000
-    milliseconds = remaining_ms % 1000
-
-    return '{}:{:02d}.{:03d}'.format(minutes, seconds, milliseconds)
+    totalMilliseconds = currentTime
+    remainingMilliseconds = totalMilliseconds % 60000
+    return '{}:{:02d}.{:03d}'.format(
+        totalMilliseconds // 60000,
+        remainingMilliseconds // 1000,
+        remainingMilliseconds % 1000
+    )
 }
 
 class AnimatedSprite {
@@ -302,13 +307,13 @@ class Character {
         self.data = data
         self.hasOwnNote = hasOwnNote
 
-        self.character = AnimatedSprite(data.sprites.idle, SPRITE_SPEED)
+        self.character = AnimatedSprite(self.data.characterSprites.idle, SPRITE_SPEED)
         if (hasOwnNote)
             self.notes = {
-                left: AnimatedSprite(data.sprites.note_left, SPRITE_SPEED),
-                down: AnimatedSprite(data.sprites.note_down, SPRITE_SPEED),
-                up: AnimatedSprite(data.sprites.note_up, SPRITE_SPEED),
-                right: AnimatedSprite(data.sprites.note_right, SPRITE_SPEED)
+                left: AnimatedSprite(self.data.noteSprites.left, SPRITE_SPEED),
+                down: AnimatedSprite(self.data.noteSprites.down, SPRITE_SPEED),
+                up: AnimatedSprite(self.data.noteSprites.up, SPRITE_SPEED),
+                right: AnimatedSprite(self.data.noteSprites.right, SPRITE_SPEED)
             }
 
         self.states = dict()
@@ -316,27 +321,27 @@ class Character {
         self.changeIdle = false
     }
 
-    func hit(self, name, success, changeCharacter=true) {
-        if (name -> self.states)
+    func hit(self, direction, success, changeCharacter=true) {
+        if (direction -> self.states)
             return
 
-        self.states[name] = none
+        self.states[direction] = none
 
         if (changeCharacter)
-            self.states[name] = self.character.sprites = \
-            self.data.sprites[(changeNote := success) ? name : name + 'Miss']
+            self.states[direction] = self.character.sprites = \
+            self.data.characterSprites[(changeNote := success) ? direction : direction + 'Miss']
         else
             changeNote = true
 
-        if (self.hasOwnNote && name -> self.notes && changeNote)
-            self.notes[name].sprites = self.data.sprites['note_' + name + (success ? 'Confirm' : 'Press')]
+        if (self.hasOwnNote && direction -> self.notes && changeNote)
+            self.notes[direction].sprites = self.data.noteSprites[direction + (success ? 'Confirm' : 'Press')]
     }
 
-    func release(self, name) {
-        if (name !> self.states)
+    func release(self, direction) {
+        if (direction !> self.states)
             return
 
-        self.states.pop(name, none)
+        self.states.pop(direction, none)
 
         for (sprite of self.states.values()) {
             if (sprite) {
@@ -345,8 +350,8 @@ class Character {
             }
         }
 
-        if (self.hasOwnNote && name -> self.notes)
-            self.notes[name].sprites = self.data.sprites['note_' + name]
+        if (self.hasOwnNote && direction -> self.notes)
+            self.notes[direction].sprites = self.data.noteSprites[direction]
 
         if (!self.states) {
             self.timeToIdle = pygame.time.get_ticks() + CHANGE_TO_IDLE
@@ -356,7 +361,7 @@ class Character {
 
     func update(self, deltaTime) {
         if (self.changeIdle && !self.states && pygame.time.get_ticks() >= self.timeToIdle) {
-            self.character.sprites = self.data.sprites.idle
+            self.character.sprites = self.data.characterSprites.idle
             self.changeIdle = false
         }
 
@@ -380,9 +385,6 @@ class SoundManager {
         self.sounds = sounds
         self.isPaused = false
     }
-
-    @staticmethod
-    func _getBusyFromSound(sound) => sound.get_busy()
 
     func stop(self) {
         for (sound of self.sounds)
@@ -409,6 +411,9 @@ class SoundManager {
             self.unpause()
     }
 
+    @staticmethod
+    func _getBusyFromSound(sound) => sound.get_busy()
+
     func getBusy(self) {
         return self.isPaused || any(map(self._getBusyFromSound, self.sounds))
     }
@@ -422,7 +427,7 @@ class Game {
 
         self.running = true
 
-        self.metadata = jsdict(loadJSON(os.path.join(modpath, 'metadata.json')))
+        self.metadata = jsdict.jsdict(loadJSON(os.path.join(modpath, 'metadata.json')))
 
         print('Loading for "{}"...'.format(self.metadata.name))
         pygame.display.set_allow_screensaver(True)
@@ -479,72 +484,75 @@ class Game {
         notes = loadImage('assets/images/notes.png')
         ratings = loadImage('assets/images/ratings.png')
 
-        takiScale = 0.6
-        feverScale = 0.45
-        gfaScale = 0.45
+        takiScale = 0.5
+        feverScale = 0.35
+        gfaScale = 0.35
         ratingScale = 0.5
-        noteScale = MOBILE ? 0.65 : 0.7
+        noteScale = 0.7
 
         self.background = pygame.transform.smoothscale(loadImage('assets/images/background.png'), GAME_RESOLUTION)
 
         self.darkSurface = pygame.Surface(GAME_RESOLUTION, pygame.SRCALPHA)
         self.darkSurface.fill((0, 0, 0, 100))
 
-        self.spritesNote = {
-            note_down: splitSpriteSheet(notes, notesXML, 'arrowDOWN', noteScale),
-            note_downConfirm: splitSpriteSheet(notes, notesXML, 'down confirm', noteScale),
-            note_downPress: splitSpriteSheet(notes, notesXML, 'down press', noteScale),
-            note_downHead: splitSpriteSheet(notes, notesXML, 'blue', noteScale)[0],
-            note_downHoldPiece: splitSpriteSheet(notes, notesXML, 'blue hold piece', noteScale)[0],
-            note_downHoldEnd: splitSpriteSheet(notes, notesXML, 'blue hold end', noteScale)[0],
+        self.noteSprites = {
+            down: splitSpriteSheet(notes, notesXML, 'arrowDOWN', noteScale),
+            downConfirm: splitSpriteSheet(notes, notesXML, 'down confirm', noteScale),
+            downPress: splitSpriteSheet(notes, notesXML, 'down press', noteScale),
+            downHead: splitSpriteSheet(notes, notesXML, 'blue', noteScale)[0],
+            downHoldPiece: splitSpriteSheet(notes, notesXML, 'blue hold piece', noteScale)[0],
+            downHoldEnd: splitSpriteSheet(notes, notesXML, 'blue hold end', noteScale)[0],
 
-            note_left: splitSpriteSheet(notes, notesXML, 'arrowLEFT', noteScale),
-            note_leftConfirm: splitSpriteSheet(notes, notesXML, 'left confirm', noteScale),
-            note_leftPress: splitSpriteSheet(notes, notesXML, 'left press', noteScale),
-            note_leftHead: splitSpriteSheet(notes, notesXML, 'purple', noteScale)[0],
-            note_leftHoldPiece: splitSpriteSheet(notes, notesXML, 'purple hold piece', noteScale)[0],
-            note_leftHoldEnd: splitSpriteSheet(notes, notesXML, 'purple hold end', noteScale)[0],
+            left: splitSpriteSheet(notes, notesXML, 'arrowLEFT', noteScale),
+            leftConfirm: splitSpriteSheet(notes, notesXML, 'left confirm', noteScale),
+            leftPress: splitSpriteSheet(notes, notesXML, 'left press', noteScale),
+            leftHead: splitSpriteSheet(notes, notesXML, 'purple', noteScale)[0],
+            leftHoldPiece: splitSpriteSheet(notes, notesXML, 'purple hold piece', noteScale)[0],
+            leftHoldEnd: splitSpriteSheet(notes, notesXML, 'purple hold end', noteScale)[0],
 
-            note_up: splitSpriteSheet(notes, notesXML, 'arrowUP', noteScale),
-            note_upConfirm: splitSpriteSheet(notes, notesXML, 'up confirm', noteScale),
-            note_upPress: splitSpriteSheet(notes, notesXML, 'up press', noteScale),
-            note_upHead: splitSpriteSheet(notes, notesXML, 'green', noteScale)[0],
-            note_upHoldPiece: splitSpriteSheet(notes, notesXML, 'green hold piece', noteScale)[0],
-            note_upHoldEnd: splitSpriteSheet(notes, notesXML, 'green hold end', noteScale)[0],
+            up: splitSpriteSheet(notes, notesXML, 'arrowUP', noteScale),
+            upConfirm: splitSpriteSheet(notes, notesXML, 'up confirm', noteScale),
+            upPress: splitSpriteSheet(notes, notesXML, 'up press', noteScale),
+            upHead: splitSpriteSheet(notes, notesXML, 'green', noteScale)[0],
+            upHoldPiece: splitSpriteSheet(notes, notesXML, 'green hold piece', noteScale)[0],
+            upHoldEnd: splitSpriteSheet(notes, notesXML, 'green hold end', noteScale)[0],
 
-            note_right: splitSpriteSheet(notes, notesXML, 'arrowRIGHT', noteScale),
-            note_rightConfirm: splitSpriteSheet(notes, notesXML, 'right confirm', noteScale),
-            note_rightPress: splitSpriteSheet(notes, notesXML, 'right press', noteScale),
-            note_rightHead: splitSpriteSheet(notes, notesXML, 'red', noteScale)[0],
-            note_rightHoldPiece: splitSpriteSheet(notes, notesXML, 'red hold piece', noteScale)[0],
-            note_rightHoldEnd: splitSpriteSheet(notes, notesXML, 'red hold end', noteScale)[0]
+            right: splitSpriteSheet(notes, notesXML, 'arrowRIGHT', noteScale),
+            rightConfirm: splitSpriteSheet(notes, notesXML, 'right confirm', noteScale),
+            rightPress: splitSpriteSheet(notes, notesXML, 'right press', noteScale),
+            rightHead: splitSpriteSheet(notes, notesXML, 'red', noteScale)[0],
+            rightHoldPiece: splitSpriteSheet(notes, notesXML, 'red hold piece', noteScale)[0],
+            rightHoldEnd: splitSpriteSheet(notes, notesXML, 'red hold end', noteScale)[0]
         }
 
         # opponent
         self.taki = Character({
             name: 'taki',
-            position: (370, 570),
-            notePosition: (100, MOBILE ? gameScreenHeight - 100 : 100),
-            sprites: {
+            position: (380, 580),
+            notePosition: (100, MOBILE ? gameScreenHeight - 80 : 80),
+            characterSprites: {
                 down: splitSpriteSheet(taki, takiXML, 'taki down', takiScale),
                 idle: splitSpriteSheet(taki, takiXML, 'taki idle', takiScale),
                 left: splitSpriteSheet(taki, takiXML, 'taki left', takiScale),
                 right: splitSpriteSheet(taki, takiXML, 'taki right', takiScale),
                 up: splitSpriteSheet(taki, takiXML, 'taki up', takiScale)
-            } | self.spritesNote
+            },
+            noteSprites: self.noteSprites
         })
 
         # player
         self.fever = Character({
             name: 'fever',
-            position: (850, 570),
-            notePosition: (MOBILE ? 475 : 850, MOBILE ? 80 : 100),
+            position: (840, 580),
+            notePosition: (MOBILE ? 475 : 845, 80),
             voiceMiss: BOT_PLAY ? none : pygame.mixer.Sound('assets/sounds/miss.ogg'),
-            sprites: {
-                ratingSick: splitSpriteSheet(ratings, ratingsXML, 'sick', ratingScale, isSpriteAnimation=false)[0],
-                ratingShit: splitSpriteSheet(ratings, ratingsXML, 'shit', ratingScale, isSpriteAnimation=false)[0],
-                ratingGood: splitSpriteSheet(ratings, ratingsXML, 'good', ratingScale, isSpriteAnimation=false)[0],
-                ratingBad: splitSpriteSheet(ratings, ratingsXML, 'bad', ratingScale, isSpriteAnimation=false)[0],
+            ratingSprites: {
+                sick: splitSpriteSheet(ratings, ratingsXML, 'sick', ratingScale, isSpriteAnimation=false)[0],
+                shit: splitSpriteSheet(ratings, ratingsXML, 'shit', ratingScale, isSpriteAnimation=false)[0],
+                good: splitSpriteSheet(ratings, ratingsXML, 'good', ratingScale, isSpriteAnimation=false)[0],
+                bad: splitSpriteSheet(ratings, ratingsXML, 'bad', ratingScale, isSpriteAnimation=false)[0]
+            },
+            characterSprites: {
                 hey: splitSpriteSheet(fever, feverXML, 'fever hey', feverScale),
                 down: splitSpriteSheet(fever, feverXML, 'fever down', feverScale),
                 downMiss: splitSpriteSheet(fever, feverXML, 'fever down miss', feverScale),
@@ -555,14 +563,15 @@ class Game {
                 rightMiss: splitSpriteSheet(fever, feverXML, 'fever right miss', feverScale),
                 up: splitSpriteSheet(fever, feverXML, 'fever up', feverScale),
                 upMiss: splitSpriteSheet(fever, feverXML, 'fever up miss', feverScale)
-            } | self.spritesNote
+            },
+            noteSprites: self.noteSprites
         })
 
         # gf (just afraid)
         self.gfa = Character({
             name: 'gfa',
-            position: (570, 530),
-            sprites: {
+            position: (580, 540),
+            characterSprites: {
                 idle: splitSpriteSheet(gfa, gfaXML, 'gfa dancing beat', gfaScale),
                 fear: splitSpriteSheet(gfa, gfaXML, 'gfa fear', gfaScale)
             }
@@ -664,21 +673,21 @@ class Game {
         scoreInfo = self.scoreInfo
 
         scoreInfo.notes += 1
-        scoreInfo.score += int(50 * score)
+        scoreInfo.score += int(SCORE_VALUE * score)
         scoreInfo.combo += 1
         scoreInfo.maxCombo = max(scoreInfo.maxCombo, scoreInfo.combo)
         scoreInfo[rating] += 1
         scoreInfo.totalAccuracyScore += RATING_VALUES[rating]
 
         self.updateAccuracy()
-        self.addRatingSurface(rating.capitalize())
+        self.addRatingSurface(rating)
     }
 
     func failedScore(self) {
         scoreInfo = self.scoreInfo
 
         scoreInfo.notes += 1
-        scoreInfo.score -= 50
+        scoreInfo.score -= SCORE_VALUE
         scoreInfo.combo = 0
         scoreInfo.missed += 1
 
@@ -687,7 +696,7 @@ class Game {
 
     func addRatingSurface(self, rating) {
         self.ratingSurfaces.append({
-            surface: self.fever.data.sprites['rating' + rating].copy(),
+            surface: self.fever.data.ratingSprites[rating].copy(),
             position: [650, 450]
         })
     }
@@ -767,7 +776,7 @@ class Game {
         KEYUP = pygame.KEYUP
         FINGERDOWN = pygame.FINGERDOWN
         FINGERUP = pygame.FINGERUP
-        NOTE_SPEED = NOTE_SPEED
+        SCROLL_SPEED = SCROLL_SPEED
         FPS = FPS
         SHOW_INFO = SHOW_INFO
         MOBILE = MOBILE
@@ -791,6 +800,7 @@ class Game {
         chunkNotes = self.chunkNotes
         addChunkNote = chunkNotes.append
         popChunkNote = chunkNotes.pop
+        noteSprites = self.noteSprites
         scoreInfo = self.scoreInfo
         songName = self.metadata.name
         tx, ty = self.taki.data.notePosition
@@ -826,11 +836,11 @@ class Game {
         max = max
         dictValues = dict.values
 
-        print('Now playing "{}" with {}x Note speed...'.format(songName, NOTE_SPEED))
+        print('Now playing "{}" with {}x scroll speed...'.format(songName, SCROLL_SPEED))
 
         while (self.running && getBusy()) {
             deltaTime = tick(FPS)
-            currentTime = int(getPos() * NOTE_SPEED)
+            currentTime = int(getPos() * SCROLL_SPEED)
             clockTime += deltaTime / 1000
 
             for (event of getEvent()) {
@@ -979,14 +989,14 @@ class Game {
                     elif (BOT_PLAY) {
                         note.pressing = false
                         scoreInfo.notes += 1
-                        scoreInfo.score += 50
+                        scoreInfo.score += SCORE_VALUE
                         scoreInfo.combo += 1
                         scoreInfo.maxCombo = scoreInfo.combo
                         scoreInfo.sick += 1
                         scoreInfo.totalAccuracyScore += RATING_VALUES.sick
                         scoreInfo.accuracy = 100.0
                         scoreInfo.rating = 'S+'
-                        self.addRatingSurface('Sick')
+                        self.addRatingSurface('sick')
                         self.fever.release(direction)
                     }
 
@@ -998,16 +1008,18 @@ class Game {
                 if (character == 'taki') {
                     showScrollNote = notOnMobile
                     noteRect = takiNotesRect[NOTES_OFFSET[direction]]
-                    y = ty - noteRect.height // 2
+                    noteHeight = noteRect.height
+                    noteHalf = noteHeight // 2
+                    y = ty - noteHalf
                 } else {
                     showScrollNote = true
                     noteRect = feverNotesRect[NOTES_OFFSET[direction]]
-                    y = fy - noteRect.height // 2
+                    noteHeight = noteRect.height
+                    noteHalf = noteHeight // 2
+                    y = fy - noteHalf
                 }
 
-                noteName = 'note_' + direction
-                noteHeadSurface = self.spritesNote[noteName + 'Head']
-                noteHeight = noteRect.height
+                noteHeadSurface = noteSprites[direction + 'Head']
                 noteHeadHeight = noteHeadSurface.get_height()
                 noteOffsetCenterY = noteHeadHeight // 2
 
@@ -1015,7 +1027,7 @@ class Game {
                 endY = y + end - currentTime
 
                 if ((!note.finished || !note.pressed) && note.length is not none) {
-                    notePieceSurface = self.spritesNote[noteName + 'HoldPiece']
+                    notePieceSurface = noteSprites[direction + 'HoldPiece']
                     pieceWidth, pieceHeight = notePieceSurface.get_size()
 
                     visible_start = max(startY, -noteHeight)
@@ -1023,7 +1035,6 @@ class Game {
 
                     if (visible_end > visible_start) {
                         x = noteRect.left + (noteRect.width - pieceWidth) // 2
-                        noteHalf = noteHeight // 2
 
                         start_i = max(0, (visible_start - startY) // pieceHeight)
                         end_i = (visible_end - startY) // pieceHeight
@@ -1036,7 +1047,7 @@ class Game {
 
                         endY += noteOffsetCenterY
                         if (!(note.pressing && endY - noteHalf < y)) {
-                            noteEndSurface = self.spritesNote[noteName + 'HoldEnd']
+                            noteEndSurface = noteSprites[direction + 'HoldEnd']
                             if (showScrollNote)
                                 screenBlit(noteEndSurface, (x, endY))
                             endY += noteEndSurface.get_height()
@@ -1097,17 +1108,17 @@ class Game {
             if (SHOW_INFO) {
                 infoSurface = renderWithLine(
                     infoFontRender,
-                    'Song: {}\nNote Speed: {}x\nFPS: {}\nTime: {}'.format(
+                    'Song: {}\nScroll speed: {}x\nFPS: {:.0f}\nTime: {}'.format(
                         songName,
-                        NOTE_SPEED,
-                        int(getFPS()),
-                        getFormatTime(int(currentTime / NOTE_SPEED))
+                        SCROLL_SPEED,
+                        getFPS(),
+                        getFormatTime(int(currentTime / SCROLL_SPEED))
                     ),
                     whiteColor,
                     blackColor
                 )
 
-                infoSurface.set_alpha(200)
+                infoSurface.set_alpha(150)
 
                 screenBlit(infoSurface, infoPosition)
             }
@@ -1121,20 +1132,29 @@ class Game {
 
 
 if (__name__ == '__main__') {
-    func getPathSong(name) => os.path.join('assets', 'songs', name.strip().lower())
+    func getPathSong(name) => 'assets/songs/' + name.strip().lower()
 
     if (SONG_NAME == '*') {
-        for (name of os.listdir(os.path.join('assets', 'songs'))) {
+        for (name of os.listdir('assets/songs')) {
             # this is an easter egg!
-            if (name == 'floccinaucinihilipilificatiophobia') continue
-            game = Game(getPathSong(name))
+            if (name == 'floccinaucinihilipilificatiophobia')
+                continue
+
+            pathSong = getPathSong(name)
+            if (!os.path.isdir(pathSong))
+                continue
+
+            game = Game(pathSong)
             game.run()
             if (!game.running)
                 break
         }
     }
-    else
+
+    else {
         Game(getPathSong(SONG_NAME)).run()
+    }
 
     print('Finished')
+    time.sleep(1)
 }
