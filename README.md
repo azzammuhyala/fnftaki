@@ -1,7 +1,9 @@
 # FNF Mod - Friday Night Fever - Only with Taki's song!!
 
 <div align="center">
-    <img src="preview.gif" alt="Preview">
+    <img src="preview1.png" alt="Preview" height="300">
+    <br>
+    <img src="preview2.png" alt="Preview" height="300">
 </div>
 
 I just made Taki VS Demon Fever using PyScript and PyGame library. This game is quite simple, with only 9 songs and
@@ -10,7 +12,7 @@ lol. PyScript runs on top of Python, which is quite slow and heavy for that.
 
 ## Requirements
 - Python (above `3.10`)
-- PyScript `pip install pyscript-programming-language` (above `1.12.9`, recommended)
+- PyScript `pip install pyscript-programming-language` (above `1.12.10`, recommended)
 - PyGame `pip install pygame-ce` or `pip install pygame`
 
 ## Run Game
@@ -28,7 +30,7 @@ Once that's done and without any issues, copy the Python code below. `GAME_PATH`
 the `main.pys` file and the `assets/` folder required by the game.
 ```py
 # Your game folder:
-GAME_PATH = r'/storage/emulated/0/Download/taki-v1.4'
+GAME_PATH = r'/storage/emulated/0/Download/taki-v1.5'
 
 import os
 
