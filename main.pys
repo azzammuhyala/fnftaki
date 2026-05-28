@@ -7,15 +7,15 @@
 # credit mod: Chewilly11, CesarFever, Mako, Tea, Foodieti, isophoro, Rifxii, FPLester, Biddle, BirdBonanza, Roll,
 #             Circle, HyphaeShade, Kip, Winkel, MegaFreedom, Peakek, Vai, Pancho, Della, Vortmite, EMG, Zarrene, Leo,
 #             Wee, TokoTakki, HunniBunnii, Shino, Pierogii, RecD, Flippy, Shelton883, Penkaru, Moopsterino, No-Mi,
-#             Rosamay, Skelly, Tanner, TheCouchPotato170, Viva, Void, Zombie, TieGuo (Bad Nun),
-#             RuvStyle (Monochrome - Taki version),
-#             MemeMods64 (Crucify and Bazinga Anniversary [Submitter, not the original creator])
+#             Rosamay, Skelly, Tanner, TheCouchPotato170, Viva, Void, Zombie, TieGuo, RuvStyle, MemeMods64, ChrisLad,
+#             Gooble, IamDaDoge, Egg Overlord, Shadow Mario, RiverOaken, shubs, PolybiusProxy, gedehari, Keoiki,
+#             SandPlanet, bubba, ninjamuffin99, PhantomArcade, evilsk8r, kawaisprite
 
 # source code: https://github.com/azzammuhyala/fnftaki
 # license code: MIT
 # author code: Azzam Muhyala
 
-# GAME: All FNF vs Taki from Friday Night Fever writen on PyScript (A programming language) with no fnf egine.
+# GAME: All of Taki's songs from Friday Night Fever writen on PyScript (A programming language) with no fnf egine.
 #       See more about PyScript here: https://github.com/azzammuhyala/pyscript
 # DISCLAIMER: I do not 100% own any assets such as characters, sounds, music, or song charts in this game.
 #             I only created the my own engine code from scratch. By the way, I'm a fan of Taki!
@@ -30,15 +30,15 @@
 # javascript
 from __future__ import dict2jsdict
 
+import 'xml.etree.ElementTree' as xmlTree
 import pygame
 import jsdict
 import json
-import math
 import time
+import sys
 import os
-import 'xml.etree.ElementTree' as xmlTree
 
-# ----------------------------------------------------- OPTIONS! ----------------------------------------------------- #
+# ----------------------------------------------------- OPTIONS? ----------------------------------------------------- #
 
 # You can change the song here according to the available song name:
 SONG_NAME = '#'
@@ -58,7 +58,7 @@ BOT_PLAY = false
 ANTI_ALIASING = true
 # If you want a higher difficulty, this will make:
 # - Taki can decrease your health every time he sings
-# - Ghost touch is disabled (reduces score and health)
+# - Ghost tapping is disabled (reduces score and health)
 HARD = false
 # game over if health is below 0, (not relevant if you are playing HARD mode when this value is false)
 DEATH_MATCH = true
@@ -99,7 +99,14 @@ NOTES_OFFSET = {
     right: 3
 }
 
-BUTTON_INFO = [
+RATING_VALUES = {
+    sick: 1.0,
+    good: 0.8,
+    bad: 0.6,
+    shit: 0.4
+}
+
+TOUCH_BUTTON = [
     {
         direction: 'left',
         key: pygame.K_LEFT,
@@ -122,20 +129,14 @@ BUTTON_INFO = [
     }
 ]
 
-RATING_VALUES = {
-    'sick': 1.0,
-    'good': 0.8,
-    'bad': 0.6,
-    'shit': 0.4
-}
-
 GAME_RESOLUTION = (1280, 720)
-NOTES_PRESSED_RANGE = 200
+NOTES_PRESSED_RANGE = 150
 NOTES_LENGTH_RANGE = 100
 CHANGE_TO_IDLE = 500
-SPRITE_SPEED = 50
+SPRITE_SPEED = 40
 SCORE_VALUE = 100
 HEALTH_AMOUNT = 0.02
+HEALTH_MINIMUM = 0.05
 
 NOTES_LENGTH_RANGE = int(NOTES_LENGTH_RANGE * SCROLL_SPEED)
 NOTES_PRESSED_RANGE = int(NOTES_PRESSED_RANGE * SCROLL_SPEED)
@@ -158,22 +159,22 @@ func splitSpriteSheet(surface, root, nameId, scale=1, reverseX=false, reverseY=f
 
         if (isSpriteAnimation) {
             try {
+                filteredName = name[:-4].strip()
                 index = int(name[-4:])
-                name = name[:-4].strip()
-            } catch
-                print('WARNING: invalid sprite name:', subtexture.get('name'))
+            } catch {
+                print('WARNING: invalid sprite name:', name, file=sys.stderr)
+                continue
+            }
         } else {
+            filteredName = name.strip()
             index = 0
-            name = name.strip()
         }
 
-        if (name == nameId) {
+        if (filteredName == nameId) {
             x = int(subtexture.get('x'))
             y = int(subtexture.get('y'))
             width = int(subtexture.get('width'))
             height = int(subtexture.get('height'))
-            # pivotX = float(subtexture.get('pivotX', 0.0))
-            # pivotY = float(subtexture.get('pivotY', 0.0))
             frameX = int(subtexture.get('frameX', 0))
             frameY = int(subtexture.get('frameY', 0))
             frameWidth = int(subtexture.get('frameWidth', width))
@@ -275,9 +276,11 @@ func renderWithLine(fontRender, text, color, backgroundColor=none) {
     return surface
 }
 
+timeFormat = '{}:{:02d}.{:03d}'.format
+
 func getFormatTime(currentTime) {
     remainingMilliseconds = currentTime % 60000
-    return '{}:{:02d}.{:03d}'.format(
+    return timeFormat(
         currentTime // 60000,
         remainingMilliseconds // 1000,
         remainingMilliseconds % 1000
@@ -285,7 +288,7 @@ func getFormatTime(currentTime) {
 }
 
 func calculateScore(currentTime, noteTime)
-    return 1 - max(0.0, min(1.0, abs(currentTime - noteTime) / NOTES_PRESSED_RANGE))
+    return 1.0 - max(0.0, min(1.0, abs(currentTime - noteTime) / NOTES_PRESSED_RANGE))
 
 class AnimatedSprite {
 
@@ -373,13 +376,13 @@ class Character {
             self.notes[direction].sprites = self.data.noteSprites[direction]
 
         if (!self.states) {
-            self.timeToIdle = pygame.time.get_ticks() + CHANGE_TO_IDLE
+            self.timeToIdle = pygame.mixer.music.get_pos() + CHANGE_TO_IDLE
             self.changeIdle = true
         }
     }
 
     func update(self, deltaTime) {
-        if (self.changeIdle && !self.states && pygame.time.get_ticks() >= self.timeToIdle) {
+        if (self.changeIdle && !self.states && pygame.mixer.music.get_pos() >= self.timeToIdle) {
             self.character.sprites = self.data.characterSprites.idle
             self.changeIdle = false
         }
@@ -433,21 +436,22 @@ class SoundManager {
     @staticmethod
     func _getBusyFromSound(sound) => sound.get_busy()
 
-    func getBusy(self) {
+    func getBusy(self)
         return self.isPaused || any(map(self._getBusyFromSound, self.sounds))
-    }
 
 }
 
 class Game {
 
-    constructor(modpath) {
+    constructor(modPath) {
         pygame.init()
 
         self.running = true
         self.gameOver = false
 
-        self.metadata = jsdict.jsdict(loadJSON(os.path.join(modpath, 'metadata.json')))
+        func pathModJoin(path) => modPath + '/' + path
+
+        self.metadata = jsdict.jsdict(loadJSON(pathModJoin('metadata.json')))
 
         print('Loading for "{}"...'.format(self.metadata.name))
 
@@ -478,7 +482,7 @@ class Game {
 
             for (i of range(4)) {
                 rect = pygame.Rect(i * buttonWidth, 0, buttonWidth, gameScreenHeight)
-                color = BUTTON_INFO[i].color
+                color = TOUCH_BUTTON[i].color
 
                 pygame.draw.rect(self.noteSurface, tuple(map(borderColor, color)), rect)
                 pygame.draw.rect(self.noteSurface, color, (
@@ -493,10 +497,9 @@ class Game {
         }
 
         if (BOT_PLAY) {
-            self.botLabelSurface = self.font.render('(BOT PLAY)', ANTI_ALIASING, (255, 255, 255))
-            self.botLabelSurfacePosition = self.botLabelSurface.get_rect(centerx=gameScreenWidth // 2, y=10)
-            self.botLabelAlpha = 255
-            self.botLabelAlphaIncrement = 1
+            self.botSurface = self.font.render('(BOT PLAY)', ANTI_ALIASING, (255, 255, 255)).convert_alpha()
+            self.botSurfacePosition = self.botSurface.get_rect(centerx=gameScreenWidth // 2, y=MOBILE ? 140 : 65)
+            self.botSurfaceAlphaIncrement = 1
         }
 
         takiXML = loadXML('assets/images/taki.xml')
@@ -523,21 +526,18 @@ class Game {
         ratingScale = 0.5
         noteScale = 0.7
         iconScale = 0.7
-        pauseIconScale = 0.6
+        pauseIconScale = 0.5
 
         self.background = pygame.transform.smoothscale(loadImage('assets/images/background.png'), GAME_RESOLUTION)
-        self.dark = pygame.Surface(GAME_RESOLUTION, pygame.SRCALPHA)
-
-        self.dark.fill((0, 0, 0, 70))
-        self.dark.blit(pygame.transform.smoothscale(loadImage('assets/images/dark.png'), GAME_RESOLUTION), (0, 0))
+        self.dark = pygame.transform.smoothscale(loadImage('assets/images/dark.png'), GAME_RESOLUTION)
 
         self.pauseSprites = {
             pause: splitSpriteSheet(pauseIcon, pauseIconXML, 'pause', pauseIconScale, isSpriteAnimation=false)[0],
             play: splitSpriteSheet(pauseIcon, pauseIconXML, 'play', pauseIconScale, isSpriteAnimation=false)[0],
         }
-
+        # assuming that both sizes are same
         w, h = self.pauseSprites.pause.get_size()
-        self.pauseRect = pygame.Rect(gameScreenWidth - w - 10, 10, w, h)
+        self.pauseRect = pygame.Rect(gameScreenWidth - w - 30, MOBILE ? 30 : gameScreenHeight - h - 30, w, h)
 
         self.noteSprites = {
             down: splitSpriteSheet(notes, notesXML, 'arrowDOWN', noteScale),
@@ -593,7 +593,7 @@ class Game {
             name: 'fever',
             position: (840, 610),
             notePosition: (MOBILE ? 475 : 845, 80),
-            voiceMiss: BOT_PLAY ? none : pygame.mixer.Sound('assets/sounds/miss.ogg'),
+            vocalMiss: BOT_PLAY ? none : pygame.mixer.Sound('assets/sounds/miss.ogg'),
             ratingSprites: {
                 sick: splitSpriteSheet(ratings, ratingsXML, 'sick', ratingScale, isSpriteAnimation=false)[0],
                 shit: splitSpriteSheet(ratings, ratingsXML, 'shit', ratingScale, isSpriteAnimation=false)[0],
@@ -635,36 +635,52 @@ class Game {
             }
         }, hasOwnNote=false)
 
-        pygame.mixer.music.load(os.path.join(modpath, self.metadata.music))
+        pygame.mixer.music.load(pathModJoin(self.metadata.music))
         pygame.mixer.music.set_volume(1)
 
-        # there is only 1 voice and instrument
+        # there is only 1 vocal and instrument
         if (self.metadata.vocal is not none) {
-            self.voice = pygame.mixer.Sound(os.path.join(modpath, self.metadata.vocal))
-            self.voice.set_volume(1)
+            self.vocal = pygame.mixer.Sound(pathModJoin(self.metadata.vocal))
+
+            self.vocal.set_volume(1)
 
             self.playMusic = func() {
                 pygame.mixer.music.play()
                 return SoundManager([
-                    self.voice.play(),
+                    self.vocal.play(),
                     pygame.mixer.music
                 ])
             }
         }
 
-        # there are 2 voices and instrument
-        elif (self.metadata.taki_vocal is not none && self.metadata.fever_vocal is not none) {
-            self.taki.voice = pygame.mixer.Sound(os.path.join(modpath, self.metadata.taki_vocal))
-            self.fever.voice = pygame.mixer.Sound(os.path.join(modpath, self.metadata.fever_vocal))
+        # there is only 1 vocal (fever vocal) and instrument
+        elif (self.metadata.taki_vocal is none && self.metadata.fever_vocal is not none) {
+            self.fever.data.vocal = pygame.mixer.Sound(pathModJoin(self.metadata.fever_vocal))
 
-            self.taki.voice.set_volume(1)
-            self.fever.voice.set_volume(1)
+            self.fever.data.vocal.set_volume(1)
 
             self.playMusic = func() {
                 pygame.mixer.music.play()
                 return SoundManager([
-                    self.taki.voice.play(),
-                    self.fever.voice.play(),
+                    self.fever.data.vocal.play(),
+                    pygame.mixer.music
+                ])
+            }
+        }
+
+        # there are 2 vocals and instrument
+        elif (self.metadata.taki_vocal is not none && self.metadata.fever_vocal is not none) {
+            self.taki.data.vocal = pygame.mixer.Sound(pathModJoin(self.metadata.taki_vocal))
+            self.fever.data.vocal = pygame.mixer.Sound(pathModJoin(self.metadata.fever_vocal))
+
+            self.taki.data.vocal.set_volume(1)
+            self.fever.data.vocal.set_volume(1)
+
+            self.playMusic = func() {
+                pygame.mixer.music.play()
+                return SoundManager([
+                    self.taki.data.vocal.play(),
+                    self.fever.data.vocal.play(),
                     pygame.mixer.music
                 ])
             }
@@ -679,7 +695,7 @@ class Game {
         }
 
         # load the chart
-        with (open(os.path.join(modpath, self.metadata.chart), 'r') as fileChart)
+        with (open(pathModJoin(self.metadata.chart), 'r') as fileChart)
             self.notes = createNotes(list(fileChart.readlines()))
 
         self.chunkNotes = []
@@ -710,12 +726,10 @@ class Game {
         self.fever.iconState = self.fever.data.iconSprites.save
         self.taki.iconState = self.taki.data.iconSprites.save
 
-        if (self.scoreInfo.health > 0.8) {
+        if (self.scoreInfo.health > 0.8)
             self.taki.iconState = self.taki.data.iconSprites.warn
-        }
-        elif (self.scoreInfo.health < 0.2) {
+        elif (self.scoreInfo.health < 0.2)
             self.fever.iconState = self.fever.data.iconSprites.warn
-        }
     }
 
     func increastHealth(self) {
@@ -727,7 +741,7 @@ class Game {
 
     func decreaseHealth(self, byTaki=false) {
         if (byTaki) {
-            if (HARD && self.scoreInfo.health - HEALTH_AMOUNT >= 0.1)
+            if (HARD && self.scoreInfo.health - HEALTH_AMOUNT >= HEALTH_MINIMUM)
                 self.scoreInfo.health -= HEALTH_AMOUNT
         }
         else
@@ -796,12 +810,24 @@ class Game {
     func addRatingSurface(self, rating) {
         self.ratingSurfaces.append({
             surface: self.fever.data.ratingSprites[rating].copy(),
-            position: [650, 450]
+            position: [650, 450],
+            velocityY: -200
         })
     }
 
+    func setFeverVocalVolume(self, volume) {
+        if (!BOT_PLAY && (vocal := self.fever.data.vocal))
+            vocal.set_volume(volume)
+    }
+
     func playerPress(self, key, currentTime) {
-        if (key !> KEYS_BINDING || BOT_PLAY || self.soundManager.isPaused)
+        if (BOT_PLAY || self.soundManager.isPaused)
+            return
+        elif (key == pygame.K_SPACE) {
+            self.fever.hit('hey', success=true)
+            return
+        }
+        elif (key !> KEYS_BINDING)
             return
 
         key = KEYS_BINDING[key]
@@ -816,6 +842,7 @@ class Game {
                 note.score = calculateScore(currentTime, note.time)
                 self.activeNotes.append(note)
                 self.fever.hit(key, success=true)
+                self.setFeverVocalVolume(1)
                 break
             }
         }
@@ -823,16 +850,23 @@ class Game {
             if (HARD) {
                 self.failedScore(missedNote=false)
                 self.fever.hit(key, success=false)
-                self.fever.data.voiceMiss.play()
+                self.setFeverVocalVolume(0)
+                self.fever.data.vocalMiss.play()
             }
             else
-                # ghost touch
+                # ghost tapping
                 self.fever.hit(key, success=false, changeCharacter=false)
         }
     }
 
     func playerRelease(self, key, currentTime) {
-        if (key !> KEYS_BINDING || BOT_PLAY || self.soundManager.isPaused)
+        if (BOT_PLAY || self.soundManager.isPaused)
+            return
+        elif (key == pygame.K_SPACE) {
+            self.fever.release('hey')
+            return
+        }
+        elif (key !> KEYS_BINDING)
             return
 
         key = KEYS_BINDING[key]
@@ -855,7 +889,8 @@ class Game {
                         self.failedScore()
                         self.fever.release(key)
                         self.fever.hit(key, success=false)
-                        self.fever.data.voiceMiss.play()
+                        self.setFeverVocalVolume(0)
+                        self.fever.data.vocalMiss.play()
                         continue
                     }
                     elif (note.end > currentTime) {
@@ -874,29 +909,25 @@ class Game {
     }
 
     func handleMobileTouch(self, event, currentTime, fn) {
-        FINGERDOWN = pygame.FINGERDOWN
         gameScreenWidth, gameScreenHeight = GAME_RESOLUTION
         touchX = event.x * gameScreenWidth
         touchY = event.y * gameScreenHeight
 
-        for (i, rect of enumerate(self.touchButton)) {
-            if (event.type == FINGERDOWN && self.pauseRect.collidepoint(touchX, touchY)) {
+        if (self.pauseRect.collidepoint(touchX, touchY)) {
+            if (event.type == pygame.FINGERDOWN)
                 self.soundManager.togglePause()
-                break
-            }
-            if (rect.collidepoint(touchX, touchY))
-                fn(BUTTON_INFO[i].key, currentTime)
+            return
         }
+
+        for (i, rect of enumerate(self.touchButton))
+            if (rect.collidepoint(touchX, touchY))
+                fn(TOUCH_BUTTON[i].key, currentTime)
     }
 
     func run(self) {
         songName = self.metadata.name
 
         pygame.display.set_caption(songName)
-
-        takiNotesRect = []
-        feverNotesRect = []
-        clockTime = 0.0
 
         self.clock = pygame.time.Clock()
         self.soundManager = self.playMusic()
@@ -905,8 +936,6 @@ class Game {
         QUIT = pygame.QUIT
         KEYDOWN = pygame.KEYDOWN
         KEYUP = pygame.KEYUP
-        FINGERDOWN = pygame.FINGERDOWN
-        FINGERUP = pygame.FINGERUP
         SCROLL_SPEED = SCROLL_SPEED
         FPS = FPS
         SHOW_INFO = SHOW_INFO
@@ -920,7 +949,6 @@ class Game {
         zeroPosition = (0, 0)
         scoresPosition = (10, 200)
         infoPosition = (10, 10)
-        pauseRect = self.pauseRect
         healthRect = pygame.Rect((gameScreenWidth - 650) / 2, gameScreenHeight - 80, 700, 20)
         healthBarRect = pygame.Rect(
             healthRect.left + 5, healthRect.top + 5,
@@ -935,6 +963,8 @@ class Game {
         blackColor = (0, 0, 0)
         takiHealthBarColor = (211, 68, 112)
         feverHealthBarColor = (227, 83, 200)
+        takiNotesRect = []
+        feverNotesRect = []
         clearTakiNoteRect = takiNotesRect.clear
         clearFeverNoteRect = feverNotesRect.clear
         addTakiNoteRect = takiNotesRect.append
@@ -943,10 +973,34 @@ class Game {
         chunkNotes = self.chunkNotes
         addChunkNote = chunkNotes.append
         popChunkNote = chunkNotes.pop
-        if (MOBILE) noteSurface = self.noteSurface
         noteSprites = self.noteSprites
+        pauseRect = self.pauseRect
         playSurface = self.pauseSprites.play
         pauseSurface = self.pauseSprites.pause
+        if (BOT_PLAY) {
+            botPlaySurface = self.botSurface
+            getBotPlaySurfaceAlpha = botPlaySurface.get_alpha
+            setBotPlaySurfaceAlpha = botPlaySurface.set_alpha
+            botSurfacePosition = self.botSurfacePosition
+        }
+        if (MOBILE) {
+            noteSurface = self.noteSurface
+        }
+        if (SHOW_INFO) {
+            getFPS = self.clock.get_fps
+            infoFormat = (
+                'Scroll speed: {:,}x\n'
+                'Hard mode: {}\nDeath match: {}\n'
+                'FPS: {:.0f}'.format
+            )
+        }
+        scoreInfoFormat = (
+            'Song: {} - Time: {}\n'
+            'Score: {:,}\n'
+            'Accuracy: {:.2f}% - Rating: {}\n'
+            'Combo: {:,} - Max: {:,}\n'
+            'Sick: {:,}\nGood: {:,}\nBad: {:,}\nShit: {:,}\nMissed: {:,}'.format
+        )
         scoreInfo = self.scoreInfo
         soundManager = self.soundManager
         taki = self.taki
@@ -959,7 +1013,6 @@ class Game {
         tick = self.clock.tick
         getBusy = self.soundManager.getBusy
         getPos = pygame.mixer.music.get_pos
-        getFPS = self.clock.get_fps
         getEvent = pygame.event.get
         drawRect = pygame.draw.rect
         screen = self.screen
@@ -976,9 +1029,6 @@ class Game {
         renderWithLine = renderWithLine
         screenBlit = screen.blit
         flip = pygame.display.flip
-        sin = math.sin
-        cos = math.cos
-        pi = math.pi
         int = int
         enumerate = enumerate
         zip = zip
@@ -989,15 +1039,18 @@ class Game {
         dictValues = dict.values
 
         print(
-            'Now playing "{}" with {}x scroll speed{}...'.format(
-                songName, SCROLL_SPEED, HARD ? ' on hard mode' : ''
+            'Now playing "{}" with {:,}x scroll speed{}...'.format(
+                songName, SCROLL_SPEED, HARD ? ' in hard mode' : ''
             )
         )
 
         while (self.running && getBusy()) {
             deltaTime = tick(FPS)
+            if (isPaused := soundManager.isPaused)
+                deltaTime = 0
+            deltaTimeSecond = deltaTime / 1000
+
             currentTime = int(getPos() * SCROLL_SPEED)
-            clockTime += deltaTime / 1000
 
             for (event of getEvent()) {
                 eventType = event.type
@@ -1007,22 +1060,22 @@ class Game {
 
                 elif (eventType == KEYDOWN) {
                     self.playerPress(event.key, currentTime)
-                    if (event.key == pygame.K_SPACE)
-                        fever.hit('hey', success=true)
-                    elif (event.key -> (pygame.K_p, pygame.K_RETURN))
+                    if (event.key -> [pygame.K_p, pygame.K_RETURN])
                         soundManager.togglePause()
+                    elif (event.key == pygame.K_F1) {
+                        fileName = '{} - {}.png'.format(songName, currentTime)
+                        pygame.image.save(screen, fileName)
+                        print('Screenshot "{}" saved.'.format(fileName))
+                    }
                 }
 
-                elif (eventType == KEYUP) {
+                elif (eventType == KEYUP)
                     self.playerRelease(event.key, currentTime)
-                    if (event.key == pygame.K_SPACE)
-                        fever.release('hey')
-                }
 
                 elif (MOBILE) {
-                    if (eventType == FINGERDOWN)
+                    if (eventType == pygame.FINGERDOWN)
                         self.handleMobileTouch(event, currentTime, self.playerPress)
-                    elif (eventType == FINGERUP)
+                    elif (eventType == pygame.FINGERUP)
                         self.handleMobileTouch(event, currentTime, self.playerRelease)
                 }
 
@@ -1044,48 +1097,6 @@ class Game {
             if (MOBILE)
                 screenBlit(noteSurface, zeroPosition)
 
-            for (i, ratingSurface of enumerate(self.ratingSurfaces)) {
-                surface = ratingSurface.surface
-
-                alpha = surface.get_alpha()
-                if (alpha <= 0) {
-                    self.ratingSurfaces.pop(i)
-                    continue
-                }
-
-                position = ratingSurface.position
-                # rating
-                screenBlit(surface, surface.get_rect(center=position))
-
-                position[1] -= 120 * deltaTime // 1000
-                surface.set_alpha(alpha - (300 * deltaTime // 1000))
-            }
-
-            width = healthBarWidth * (1.0 - scoreInfo.health)
-            right = healthBarLeft + width
-
-            # health bar
-            drawRect(screen, blackColor, healthRect)
-            drawRect(screen, feverHealthBarColor, healthBarRect)
-            drawRect(screen, takiHealthBarColor, (healthBarLeft, healthBarTop, width, healthBarHeight))
-
-            # icons
-            screenBlit(
-                iconState := taki.iconState,
-                iconState.get_rect(
-                    centerx=right - 35,
-                    centery=healthBarCenterY
-                )
-            )
-
-            screenBlit(
-                iconState := fever.iconState,
-                iconState.get_rect(
-                    centerx=right + 35,
-                    centery=healthBarCenterY
-                )
-            )
-
             clearTakiNoteRect()
             clearFeverNoteRect()
 
@@ -1093,25 +1104,8 @@ class Game {
                 takiSurface = takiNote._sprites[takiNote.currentIndex]
                 feverSurface = feverNote._sprites[feverNote.currentIndex]
 
-                addTakiNoteRect(
-                    takiRect := takiSurface.get_rect(
-                        center=(
-                            tx + 110 * i + 15 * sin((clockTime + i * 0.5) * pi),
-                            ty + 10 * cos((clockTime + i * 0.25) * pi)
-                        )
-                    )
-                )
-
-                feverIndexOffset = i + 4
-
-                addFeverNoteRect(
-                    feverRect := feverSurface.get_rect(
-                        center=(
-                            fx + 110 * i + 15 * sin((clockTime + feverIndexOffset * 0.5) * pi),
-                            fy + 10 * cos((clockTime + feverIndexOffset * 0.25) * pi)
-                        )
-                    )
-                )
+                addTakiNoteRect(takiRect := takiSurface.get_rect(centerx=tx + 110 * i, centery=ty))
+                addFeverNoteRect(feverRect := feverSurface.get_rect(centerx=fx + 110 * i, centery=fy))
 
                 # notes
                 screenBlit(takiSurface, takiRect)
@@ -1159,7 +1153,8 @@ class Game {
                         note.started = true
                         self.failedScore()
                         fever.hit(direction, success=false)
-                        fever.data.voiceMiss.play()
+                        self.setFeverVocalVolume(0)
+                        fever.data.vocalMiss.play()
                     }
                 }
 
@@ -1203,10 +1198,10 @@ class Game {
                     noteRect = feverNotesRect[NOTES_OFFSET[direction]]
                 }
 
-                noteHeight = noteRect.height
-                noteHalf = noteHeight // 2
                 noteHeadSurface = noteSprites[direction + 'Head']
                 noteHeadHeight = noteHeadSurface.get_height()
+                noteHeight = noteRect.height
+                noteHalf = noteHeight // 2
                 noteOffsetCenterY = noteHeadHeight // 2
 
                 y = noteRect.top
@@ -1234,21 +1229,15 @@ class Game {
                         }
 
                         endY += noteOffsetCenterY
-                        if (!(note.pressing && endY - noteHalf < y)) {
-                            noteEndSurface = noteSprites[direction + 'HoldEnd']
-                            if (showScrollNote)
-                                screenBlit(noteEndSurface, (x, endY))
+                        if (showScrollNote && !(note.pressing && endY - noteHalf < y)) {
+                            screenBlit(noteEndSurface := noteSprites[direction + 'HoldEnd'], (x, endY))
                             endY += noteEndSurface.get_height()
                         }
                     }
                 }
 
-                if (!note.pressed) {
-                    if (showScrollNote)
-                        screenBlit(
-                            noteHeadSurface,
-                            noteHeadSurface.get_rect(centerx=noteRect.centerx, y=startY)
-                        )
+                if (showScrollNote && !note.pressed) {
+                    screenBlit(noteHeadSurface, noteHeadSurface.get_rect(centerx=noteRect.centerx, y=startY))
                     endY += noteHeadHeight
                 }
 
@@ -1257,42 +1246,72 @@ class Game {
                     popChunkNote(indexNote)
             }
 
-            scoreSurface = renderWithLine(
-                fontRender,
-                'Score: {}\nAccuracy: {:.2f}% - Rating: {}\nCombo: {} - Max: {}\n'
-                'Sick: {}\nGood: {}\nBad: {}\nShit: {}\nMissed: {}'.format(
-                    scoreInfo.score,
-                    scoreInfo.accuracy, scoreInfo.rating,
-                    scoreInfo.combo, scoreInfo.maxCombo,
-                    scoreInfo.sick,
-                    scoreInfo.good,
-                    scoreInfo.bad,
-                    scoreInfo.shit,
-                    scoreInfo.missed
-                ),
-                whiteColor
+            width = healthBarWidth * (1.0 - scoreInfo.health)
+            right = healthBarLeft + width
+
+            # health bar
+            drawRect(screen, blackColor, healthRect)
+            drawRect(screen, feverHealthBarColor, healthBarRect)
+            drawRect(screen, takiHealthBarColor, (healthBarLeft, healthBarTop, width, healthBarHeight))
+
+            # icons
+            screenBlit(
+                iconState := taki.iconState,
+                iconState.get_rect(centerx=right - 35, centery=healthBarCenterY)
             )
+            screenBlit(
+                iconState := fever.iconState,
+                iconState.get_rect(centerx=right + 35, centery=healthBarCenterY)
+            )
+
+            for (i, ratingSurface of enumerate(self.ratingSurfaces)) {
+                surface = ratingSurface.surface
+
+                if ((alpha := surface.get_alpha()) <= 0) {
+                    self.ratingSurfaces.pop(i)
+                    continue
+                }
+
+                # rating
+                screenBlit(surface, surface.get_rect(center=(position := ratingSurface.position)))
+
+                ratingSurface.velocityY += 600 * deltaTimeSecond
+                position[1] += ratingSurface.velocityY * deltaTimeSecond
+                surface.set_alpha(alpha - (350 * deltaTimeSecond))
+            }
 
             # scores
             screenBlit(
-                scoreSurface,
+                scoreSurface := renderWithLine(
+                    fontRender,
+                    scoreInfoFormat(
+                        songName, getFormatTime(int(currentTime / SCROLL_SPEED)),
+                        scoreInfo.score,
+                        scoreInfo.accuracy, scoreInfo.rating,
+                        scoreInfo.combo, scoreInfo.maxCombo,
+                        scoreInfo.sick,
+                        scoreInfo.good,
+                        scoreInfo.bad,
+                        scoreInfo.shit,
+                        scoreInfo.missed
+                    ),
+                    whiteColor
+                ),
                 scoreSurface.get_rect(left=10, bottom=gameScreenHeight - 10)
             )
 
-            if (BOT_PLAY) {
-                botLabelSurface = self.botLabelSurface.copy()
+            # pause
+            screenBlit(isPaused ? playSurface : pauseSurface, pauseRect)
 
-                self.botLabelAlpha += 400 * deltaTime / 1000 * self.botLabelAlphaIncrement
-                alpha = self.botLabelAlpha
+            if (BOT_PLAY) {
+                alpha = getBotPlaySurfaceAlpha() + 350 * deltaTimeSecond * self.botSurfaceAlphaIncrement
                 if (!(0 <= alpha <= 255)) {
-                    self.botLabelAlpha = alpha = pygame.math.clamp(alpha, 0, 255)
-                    self.botLabelAlphaIncrement *= -1
+                    alpha = pygame.math.clamp(alpha, 0, 255)
+                    self.botSurfaceAlphaIncrement *= -1
                 }
 
-                botLabelSurface.set_alpha(alpha)
-
-                # bot play
-                screenBlit(botLabelSurface, self.botLabelSurfacePosition)
+                setBotPlaySurfaceAlpha(alpha)
+                screenBlit(botPlaySurface, botSurfacePosition)
             }
 
             # dark
@@ -1301,30 +1320,21 @@ class Game {
             if (SHOW_INFO) {
                 infoSurface = renderWithLine(
                     infoFontRender,
-                    'Song: {}\nScroll speed: {}x\nHard mode: {}\nDeath match: {}\nFPS: {:.0f}\nTime: {}'.format(
-                        songName,
+                    infoFormat(
                         SCROLL_SPEED,
                         HARD,
                         DEATH_MATCH,
-                        getFPS(),
-                        getFormatTime(int(currentTime / SCROLL_SPEED))
+                        getFPS()
                     ),
                     whiteColor,
                     blackColor
                 )
 
-                infoSurface.set_alpha(150)
+                infoSurface.set_alpha(120)
 
                 # info
                 screenBlit(infoSurface, infoPosition)
             }
-
-            # pause
-            if (MOBILE)
-                screenBlit(
-                    soundManager.isPaused ? playSurface : pauseSurface,
-                    pauseRect
-                )
 
             # refresh screen
             flip()
@@ -1341,7 +1351,7 @@ if (__name__ == '__main__') {
     if (SONG_NAME -> '*#') {
         names = (
             SONG_NAME == '*' ?
-            filter(func(name) => name != 'floccinaucinihilipilificatiophobia', os.listdir('assets/songs')) :
+            filter(func(name) => name != '__others__', os.listdir('assets/songs')) :
             (
                 'bazinga', 'crucify',
                 'prayer', 'bad-nun',
@@ -1370,10 +1380,10 @@ if (__name__ == '__main__') {
     }
 
     if (game.gameOver) {
-        print('GAME OVER - You died')
+        print('GAME OVER - You died.', file=sys.stderr)
         time.sleep(2)
     }
 
-    print('Finished')
+    print('Finished.')
     time.sleep(1)
 }
