@@ -1,12 +1,12 @@
-# convert a default chart from Psych FNF Egine (i guess it's from Psych) to a simple chart
+# convert a chart from Psych Egine (i guess it's from Psych) and/or V-Sliced to a simple chart
 
 import json
 import re
 
-CHART_PATH = r'bazinga/bazinga.json'
-RESULT_PATH = r'assets/songs/bazinga-anniversary/chart.csv'
+CHART_PATH = r'danger-hard.json'
+RESULT_PATH = r'assets/songs/__others__/danger/chart.csv'
 
-func converter(fn) {
+func converterFromPsych(fn) {
     with (open(CHART_PATH, 'r') as file)
         dataChart = json.load(file)
 
@@ -67,6 +67,22 @@ func converter(fn) {
     with (open(RESULT_PATH, 'w') as file)
         file.write(fn(result))
 }
+
+func converterFromVsliced(fn) {
+    with (open(CHART_PATH, 'r') as file)
+        dataChart = json.load(file)
+
+    result = list(comprehension(dataChart['notes']['hard'], func(note) => {
+        'd': note['d'],
+        't': int(note['t']),
+        'l': (l := note.get('l')) is None ? 0 : int(l),
+    }))
+
+    with (open(RESULT_PATH, 'w') as file)
+        file.write(fn(result))
+}
+
+converter = converterFromPsych
 
 # to .json
 # converter(func(result) {

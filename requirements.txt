@@ -1,0 +1,2 @@
+pyscript-programming-language>=1.12.10
+pygame

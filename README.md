@@ -15,7 +15,7 @@ lol. PyScript runs on top of Python, which is quite slow and heavy for that.
 - PyScript `pip install pyscript-programming-language` (above `1.12.10`, recommended)
 - PyGame `pip install pygame-ce` or `pip install pygame`
 
-## Run Game
+## Run the game
 Execute this command (run the file `main.pys` with pyscript interpreter):
 ```sh
 python -m pyscript main.pys
@@ -30,23 +30,22 @@ Once that's done and without any issues, copy the Python code below. `GAME_PATH`
 the `main.pys` file and the `assets/` folder required by the game.
 ```py
 # Your game folder:
-GAME_PATH = r'/storage/emulated/0/Download/taki-v1.5'
+GAME_PATH = r'/storage/emulated/0/Download/taki-v1.5.1'
 
 import os
 
 # WARNING: This configuration section must be at the top before importing pygame or pyscript because it will be read
 # when it is first imported so that the configuration can be implemented
-os.chdir(GAME_PATH)
 os.environ['PYSCRIPT_NO_GIL'] = '1'
 os.environ['PYSCRIPT_NO_TYPECHECK'] = '1'
+os.chdir(GAME_PATH)
 
 import pyscript
 import pygame
 
 with open('main.pys', 'r', encoding='utf-8') as file:
     source = file.read()
-
-del file
+    del file
 
 # `globals=undefined` prevents using the python namespace where python and pyscript builtins differ
 # `flags=NO_COLOR` disables ansi colors when errors occur, sometimes applications don't apply ansi colors which

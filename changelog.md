@@ -1,8 +1,5 @@
-# Change Log
+# Change Logs
 - UI improvements.
-- UI and character size scaling improvements.
-- Score calculation improvements.
-- Health point and deathmatch systems.
-- `HARD` mode added.
-- `MOBILE` pause toggle added.
-- Tolerance for releasing long notes too quickly before they end.
+- Note press tolerance time has been reduced from 200ms to 150ms.
+- Improved the pause toggle mechanism.
+- Improved optimization.
