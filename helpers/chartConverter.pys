@@ -1,101 +1,128 @@
-# convert a chart from Psych Egine (i guess it's from Psych) and/or V-Sliced to a simple chart
-
 import json
 import re
 
-CHART_PATH = r'danger-hard.json'
-RESULT_PATH = r'assets/songs/__others__/danger/chart.csv'
+CHART_PATH = r''
+RESULT_PATH = r''
+DIFFICULTY = 'hard'
+CONVERTER = 'Psych'
+OFFSET = 0
+
+func load()
+    with (open(CHART_PATH, 'r') as file)
+        return json.load(file)
+
+func save(notes, fn) {
+    notes.sort(key=func(note) => note[1])
+    with (open(RESULT_PATH, 'w') as file)
+        file.write(fn(notes))
+}
 
 func converterFromPsych(fn) {
-    with (open(CHART_PATH, 'r') as file)
-        dataChart = json.load(file)
-
-    sections = dataChart['song']['notes']
-    totalSections = len(sections)
+    dataChart = load()
 
     result = []
-    notesRegister = set()
+    registered = set()
 
-    for (i, notes of enumerate(sections, start=1)) {
-        sectionNotes = notes['sectionNotes']
-        totalNotes = len(sectionNotes)
+    for (notes of dataChart['song']['notes']) for (note of notes['sectionNotes']) {
+        idDirection = note[1]
+        noteType = len(note) == 4 ? note[3] : 0
 
-        for (j, note of enumerate(sectionNotes, start=1)) {
-            idDirection = note[1]
+        if (!(isinstance(idDirection, int) && 0 <= idDirection <= 7) || noteType != 0)
+            continue
 
-            if (!(isinstance(idDirection, int) && 0 <= idDirection <= 7)) {
-                print('Skipped note', j, 'with direction ID', repr(idDirection))
-                continue
-            }
+        idDirection = notes['mustHitSection'] ? idDirection : (idDirection<4 ? idDirection+4 : idDirection-4)
 
-            try {
-                time = int(note[0])
-                length = int(note[2])
-                note = (idDirection, time)
-            } catch (e) {
-                print('An error occurred in', j, ':', e)
-                continue
-            }
+        try {
+            time = int(note[0]) - OFFSET
+            length = len(note) == 3 ? int(note[2]) : 0
+            note = (idDirection, time)
+        } catch
+            continue
 
-            if (note in notesRegister) {
-                print('Skipped note', j, 'with duplicate note', repr(note))
-                continue
-            }
+        if (note in registered)
+            continue
+        registered.add(note)
 
-            notesRegister.add(note)
+        note = [idDirection, time]
+        if (length > 0)
+            note.append(length)
 
-            if (notes['mustHitSection']) {
-                result.append({
-                    'd': idDirection,
-                    't': time,
-                    'l': length
-                })
-            } else {
-                result.append({
-                    'd': idDirection<4 ? idDirection+4 : idDirection-4,
-                    't': time,
-                    'l': length
-                })
-            }
-
-            print(j, 'of', totalNotes, 'notes from the', '%i/%i' % (i, totalSections), 'section order')
-        }
-
-        print(i, 'of', totalSections, 'sections')
+        result.append(note)
     }
 
-    with (open(RESULT_PATH, 'w') as file)
-        file.write(fn(result))
+    save(result, fn)
 }
 
 func converterFromVsliced(fn) {
-    with (open(CHART_PATH, 'r') as file)
-        dataChart = json.load(file)
+    dataChart = load()
 
-    result = list(comprehension(dataChart['notes']['hard'], func(note) => {
-        'd': note['d'],
-        't': int(note['t']),
-        'l': (l := note.get('l')) is None ? 0 : int(l),
-    }))
+    result = []
+    registered = set()
 
-    with (open(RESULT_PATH, 'w') as file)
-        file.write(fn(result))
+    for (note in dataChart['notes'][DIFFICULTY]) {
+        idDirection = note['d']
+        noteType = note.get('k', 0)
+
+        if (!(isinstance(idDirection, int) && 0 <= idDirection <= 7) || noteType != 0)
+            continue
+
+        try {
+            time = int(note['t']) - OFFSET
+            length = int(note.get('l', 0))
+            note = (idDirection, time)
+        } catch
+            continue
+
+        if (note in registered)
+            continue
+        registered.add(note)
+
+        note = [idDirection, time]
+        if (length > 0)
+            note.append(length)
+
+        result.append(note)
+    }
+
+    save(result, fn)
 }
 
-converter = converterFromPsych
+func converterFromOtherPsych(fn) {
+    dataChart = load()
 
-# to .json
-# converter(func(result) {
-#     return re.sub(r'\s+', '', json.dumps(result))
-# })
+    result = []
+    registered = set()
 
-# to .csv
-converter(func(result) {
-    return '\n'.join(comprehension(result, func(note) {
-        data = [note['d'], note['t']]
-        l = note['l']
-        if (l is not None and l > 0)
-            data.append(l)
-        return ','.join(map(repr, data))
-    }))
-})
+    for (notes of dataChart['strumLines']) for (note of notes['notes']) {
+        idDirection = note['id']
+        noteType = note.get('type', 0)
+
+        if (!(isinstance(idDirection, int) && 0 <= idDirection <= 7) || noteType != 0)
+            continue
+
+        idDirection = notes['position'] == 'boyfriend' ? idDirection : (idDirection<4 ? idDirection+4 : idDirection-4)
+
+        try {
+            time = int(note['time']) - OFFSET
+            length = int(note.get('sLen', 0))
+            note = (idDirection, time)
+        } catch
+            continue
+
+        if (note in registered)
+            continue
+        registered.add(note)
+
+        note = [idDirection, time]
+        if (length > 0)
+            note.append(length)
+
+        result.append(note)
+    }
+
+    save(result, fn)
+}
+
+locals()['converterFrom' + CONVERTER.strip()](
+    func(result) => '\n'.join(comprehension(result, func(note) => ','.join(map(repr, note))))
+)

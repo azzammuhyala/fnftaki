@@ -1,14 +1,17 @@
-from keyboard import press, release # pip install keyboard
 from time import sleep
 
+# install: `pip install keyboard`
+from keyboard import press, release
+
+print('Ready!')
 while (1) {
     press('a')
-    release('a')
     press('s')
-    release('s')
     press('w')
-    release('w')
     press('d')
+    sleep(0.166)
+    release('a')
+    release('s')
+    release('w')
     release('d')
-    sleep(0.05)
 }

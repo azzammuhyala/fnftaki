@@ -1,0 +1,103 @@
+# Source mod: https://gamebanana.com/mods/615737, https://gamebanana.com/mods/425462 (Bad Nun),
+#             https://gamebanana.com/mods/332345 and
+#             https://www.youtube.com/watch?v=vqZWYbdyr1U, and
+#             https://gamejolt.com/games/fnf-ruvstyle-collection/717914 (Monochrome - Taki version),
+#             https://gamebanana.com/mods/310465 (Prayer),
+#             https://gamebanana.com/mods/336064, and
+#             https://gamejolt.com/games/AnnivesaryMod/660780 (Crucify and Bazinga Anniversary),
+#             https://gamebanana.com/mods/321357 (Crucify Sarvente),
+#             https://www.youtube.com/watch?v=QMACpceDb_Y (Genocide - Taki vs Nikusa version),
+#             https://gamebanana.com/mods/336348 (Tabi), and https://gamebanana.com/mods/284934 (Entity)
+# License mod: Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License.
+# Credit mod: Chewilly11, CesarFever, Mako, Tea, Foodieti, isophoro, Rifxii, FPLester, Biddle, BirdBonanza, Roll,
+#             Circle, HyphaeShade, Kip, Winkel, MegaFreedom, Peakek, Vai, Pancho, Della, Vortmite, EMG, Zarrene, Leo,
+#             Wee, TokoTakki, HunniBunnii, Shino, Pierogii, RecD, Flippy, Shelton883, Penkaru, Moopsterino, No-Mi,
+#             Rosamay, Skelly, Tanner, TheCouchPotato170, Viva, Void, Zombie, TieGuo, RuvStyle, MemeMods64, ChrisLad,
+#             Gooble, IamDaDoge, Egg Overlord, Shadow Mario, RiverOaken, shubs, PolybiusProxy, gedehari, Keoiki,
+#             SandPlanet, bubba, ninjamuffin99, PhantomArcade, evilsk8r, kawaisprite, Alonso599, Dokki.doodlez,
+#             nota_nota, Blantados, Starrilia, SugarRatio, Homskiy, Tenzubushi, Gersgard, Cougar MacDowall, Dicartal,
+#             Angelattes, AmazeinG666, Elemenopee, Direlinqqed, SadSamuraiMan, bbpanzu, MikeGeno, aus_si, P.GOD,
+#             ChromaSen, TAEYAI, RIVEREN, Yoshubs, TheDragShot, deivid36, [and more..]
+
+# Source code: https://github.com/azzammuhyala/fnftaki
+# License code: MIT
+# Author code: AzzamMuhyala
+
+# GAME: All of Taki's songs writen on PyScript (A programming language written in Python) with no fnf egine.
+#       See more about PyScript here: https://github.com/azzammuhyala/pyscript
+# DISCLAIMER: I DO NOT 100% own any assets such as characters, sounds, music, song charts, etc in this game.
+#             I ONLY created the my own engine code from scratch. By the way, I'm a fan of Taki!
+
+# Available songs: 'bazinga', 'crucify', 'prayer', 'bad nun', 'feel the rage', 'bazinga anniversary',
+#                  'crucify anniversary', 'crucify sarvente' (NEW), 'genocide' (NEW), 'monochrome'
+
+if (__name__ == '__main__')
+    throw Exception("Oops! You've executed the wrong script file, try main.pys instead!")
+import 'pygame.constants' as key
+
+# ----------------------------------------------------- OPTIONS ------------------------------------------------------ #
+
+# NOTE: 1 is true (enabled), 0 is false (disabled)
+
+# You can change the song here according to the available song name:
+SONG_NAME = 'crucify'
+# Set maximum FPS (integer):
+FPS = 60
+# Show debug info:
+SHOW_INFO = 0
+# If you using on mobile ("PyramIDE: Python 3 IDE" or "Pydroid 3") change this to 1 (this makes the scroll centered):
+MOBILE = 0
+# If you want fullscreen:
+FULL_SCREEN = 0
+# If you want the scroll to be in the middle of the screen (centered):
+MIDDLE_SCROLL = 0
+# Set anti aliasing:
+ANTI_ALIASING = 1
+# Implement zoom animation for each note pressed and every 1.5 seconds:
+ZOOM = 1
+# Miss sound will be played every time you miss:
+MISS_SOUND = 1
+# If your device is a bit potato, you can set this; this will make:
+# - MIDDLE_SCROLL enabled
+# - ANTI_ALIASING disabled
+# - ZOOM disabled
+# - Rating popup not appear
+BEST_PERFORMANCE = 0
+# If you want a higher difficulty; this will make:
+# - Taki can decrease your health every time she sings
+# - Ghost tapping is disabled (reduces score and health)
+HARD = 0
+# Game over when health is below 0:
+DEATH_MATCH = 1
+# Bot play (just watching):
+BOT_PLAY = 0
+
+# You also can change the keys binding here:
+KEYS_BINDING = {
+    key.K_UP: 'up',
+    key.K_DOWN: 'down',
+    key.K_LEFT: 'left',
+    key.K_RIGHT: 'right',
+
+    key.K_w: 'up',
+    key.K_s: 'down',
+    key.K_a: 'left',
+    key.K_d: 'right',
+
+    key.K_k: 'up',
+    key.K_l: 'right',
+
+    key.K_RETURN: 'pause',
+    key.K_ESCAPE: 'pause',
+
+    key.K_SPACE: 'hey',
+    key.K_F1: 'screenshot'
+}
+
+# -------------------------------------------------------------------------------------------------------------------- #
+
+__all__ = tuple(comprehension(
+    locals(),
+    func(key) => key,
+    func(key) => !(key.startswith('_') || key == 'key')
+))

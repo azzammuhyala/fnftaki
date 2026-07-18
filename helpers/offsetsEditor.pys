@@ -1,0 +1,251 @@
+import 'xml.etree.ElementTree' as xmlTree
+import pygame
+import sys
+import os
+import re
+
+func loadImage(path)
+    => pygame.image.load(path).convert_alpha()
+
+func autoLoadSprites(sprite) {
+    removeIndex = re.compile(r'\d{4}$').sub
+    return dict(map(
+        func(name) => (name, sprite.split(name)),
+        sorted(map(
+            func(name) => removeIndex('', name),
+            sprite.getNames()
+        ))
+    ))
+}
+
+func prettyJsdict(dictionary) {
+    file = sys.stdout
+    file.write('{\n')
+    for (i, (key, value) of enumerate(dictionary.items())) {
+        file.write('    ')
+        file.write(repr(key))
+        file.write(': ')
+        file.write(repr(value))
+        if (i < len(dictionary) - 1)
+            file.write(',\n')
+    }
+    file.write('\n}\n')
+}
+
+class Sprite {
+
+    constructor(path, scale=1, flipX=false, flipY=false, antiAliasing=true, isAnimation=true) {
+        self.path = path
+        self.scale = scale
+        self.flipX = bool(flipX)
+        self.flipY = bool(flipY)
+        self.antiAliasing = bool(antiAliasing)
+        self.isAnimation = bool(isAnimation)
+        self.configuration = xmlTree.parse(path).getroot()
+        self.sprite = loadImage(os.path.dirname(path) + '/' + self.configuration.get('imagePath'))
+    }
+
+    func getNames(self)
+        => tuple(set(map(func(subtexture) {
+            textureName = subtexture.get('name')
+            return (self.isAnimation ? textureName[:-4] : textureName).strip()
+        }, self.configuration.findall('SubTexture'))))
+
+    func split(self, name) {
+        if (name is none)
+            return ()
+
+        frames = []
+        index = -1
+        scaleFunction = self.antiAliasing ? pygame.transform.smoothscale : pygame.transform.scale
+
+        for (subtexture of self.configuration.findall('SubTexture')) {
+            textureName = subtexture.get('name')
+
+            if (self.isAnimation) {
+                try {
+                    filteredName = textureName[:-4]
+                    index = int(textureName[-4:])
+                } catch {
+                    print('WARNING: Invalid sprite name:', textureName, file=sys.stderr)
+                    continue
+                }
+            } else {
+                filteredName = textureName
+                index += 1
+            }
+
+            if (filteredName.strip() == name) {
+                x = int(subtexture.get('x'))
+                y = int(subtexture.get('y'))
+                width = int(subtexture.get('width'))
+                height = int(subtexture.get('height'))
+                frameX = int(subtexture.get('frameX', 0))
+                frameY = int(subtexture.get('frameY', 0))
+                frameWidth = int(subtexture.get('frameWidth', width))
+                frameHeight = int(subtexture.get('frameHeight', height))
+
+                frame = pygame.Surface((frameWidth, frameHeight), pygame.SRCALPHA)
+                frame.blit(self.sprite.subsurface(x, y, width, height), (-frameX, -frameY))
+                if (self.scale != 1)
+                    frame = scaleFunction(frame, (frameWidth * self.scale, frameHeight * self.scale))
+                if (self.flipX || self.flipY)
+                    frame = pygame.transform.flip(frame, self.flipX, self.flipY)
+
+                frames.append((index, frame.convert_alpha()))
+            }
+        }
+
+        return tuple(comprehension(
+            sorted(frames, key=func(item) => item[0]),
+            func(index, frame) => frame
+        ))
+    }
+
+}
+
+class AnimatedSprite {
+
+    _placeHolder = pygame.Surface((100, 100))
+    _placeHolder.fill((0, 0, 0))
+    pygame.draw.rect(_placeHolder, (255, 0, 255), (50, 0, 50, 50))
+    pygame.draw.rect(_placeHolder, (255, 0, 255), (0, 50, 50, 50))
+
+    constructor(frames, loop=true) {
+        self.frames = frames
+        self.loop = loop
+        self.timeAccumulator = 0
+    }
+
+    @property
+    func frames(self)
+        => self._frames
+
+    @frames.setter
+    func frames(self, value) {
+        self.currentIndex = 0
+        self._frames = value
+    }
+
+    func update(self, deltaTime) {
+        length = len(self._frames)
+        if (length == 0)
+            return
+
+        self.timeAccumulator += deltaTime
+        while (self.timeAccumulator >= spriteSpeed) {
+            self.timeAccumulator -= spriteSpeed
+            if (self.loop)
+                self.currentIndex = (self.currentIndex + 1) % length
+            elif (self.currentIndex < length - 1) {
+                self.currentIndex += 1
+                if (self.currentIndex == length - 1) {
+                    self.timeAccumulator = 0
+                    break
+                }
+            }
+        }
+    }
+
+    func getFrame(self)
+        => self._frames[self.currentIndex] if self._frames else self._placeHolder
+
+}
+
+pygame.init()
+
+pygame.display.set_caption('Offsets Editor')
+
+running = True
+screen = pygame.display.set_mode((1280, 720))
+
+spriteSpeed = 41
+position = [0, 0]
+state = 'idle'
+offsets = {}
+
+sprite = Sprite(
+    r'assets\images\characters\takiOld.xml',
+    scale=1,
+    flipX=false,
+    flipY=false,
+    antiAliasing=true,
+    isAnimation=true
+)
+
+incrementer = 1
+sprites = autoLoadSprites(sprite)
+keys = list(sprites.keys())
+index = keys.index(state)
+offset = list(offsets.get(state, (0, 0)))
+animate = AnimatedSprite(sprites[state])
+font = pygame.font.SysFont('Monospace', 25)
+powerKeys = frozenset([pygame.K_LSHIFT, pygame.K_RSHIFT, pygame.K_LCTRL, pygame.K_RCTRL])
+clock = pygame.time.Clock()
+
+benchmark = sprites[state][0]
+benchmark.set_alpha(128)
+
+while (running) {
+    dt = clock.tick(60)
+
+    for (event of pygame.event.get()) {
+
+        if (event.type == pygame.QUIT)
+            running = False
+
+        elif (event.type == pygame.KEYDOWN) {
+            if (event.key == pygame.K_SPACE) {
+                index = (index + 1) % len(sprites)
+                state = keys[index]
+                animate.frames = sprites[state]
+                offset = list(offsets.get(state, offset))
+            }
+            elif (event.key == pygame.K_RETURN) {
+                offsets[state] = tuple(offset)
+                print('Saved offset', state, 'to', offset)
+            }
+            elif (event.key in powerKeys)
+                incrementer *= 10
+            elif (event.key == pygame.K_UP)
+                position[1] -= incrementer
+            elif (event.key == pygame.K_DOWN)
+                position[1] += incrementer
+            elif (event.key == pygame.K_LEFT)
+                position[0] -= incrementer
+            elif (event.key == pygame.K_RIGHT)
+                position[0] += incrementer
+            elif (event.key == pygame.K_w)
+                offset[1] += incrementer
+            elif (event.key == pygame.K_s)
+                offset[1] -= incrementer
+            elif (event.key == pygame.K_a)
+                offset[0] += incrementer
+            elif (event.key == pygame.K_d)
+                offset[0] -= incrementer
+        }
+
+        elif (event.type == pygame.KEYUP)
+            if (event.key in powerKeys)
+                incrementer //= 10
+
+    }
+
+    animate.update(dt)
+
+    screen.fill((0, 0, 0))
+    screen.blit(animate.getFrame(), (position[0] - offset[0], position[1] - offset[1]))
+    screen.blit(benchmark, position)
+
+    info = font.render(
+        'State: {!r}, Position: {}, Offset: {}'
+        .format(state, position, offset),
+        True, (255, 255, 255), (0, 0, 0)
+    )
+    screen.blit(info, info.get_rect(left=0, bottom=screen.get_height()))
+
+    pygame.display.flip()
+}
+
+prettyJsdict(offsets)
+pygame.quit()

@@ -1,5 +1,18 @@
 # Change Logs
 - UI improvements.
-- Note press tolerance time has been reduced from 200ms to 150ms.
-- Improved the pause toggle mechanism.
-- Improved optimization.
+- Optimization improvements.
+- Zoom mechanism added.
+- Sprite animation improvements.
+- Scores improvements.
+- Removed the song 'Hallow' (there was a mechanic that couldn't be implemented here).
+- Added the song 'Crucify Sarvente'.
+- Added the song 'Genocide'.
+- Added middle scrolling.
+- Replaced hyphens (`-`) in song names with spaces (` `).
+- Removed `SONG_NAME` with `#` and `*` (removed because a memory leak issue, so only one song could be played at a time).
+- Added debug information for memory consumption.
+- Added several options.
+- Added new combo breaks score information.
+- Added new stages and characters.
+- Added custom events written in scripts.
+- Etc.
