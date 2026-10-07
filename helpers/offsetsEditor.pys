@@ -159,13 +159,14 @@ pygame.display.set_caption('Offsets Editor')
 running = True
 screen = pygame.display.set_mode((1280, 720))
 
+bgcolor = (255, 255, 255)
 spriteSpeed = 41
 position = [0, 0]
 state = 'idle'
 offsets = {}
 
 sprite = Sprite(
-    r'assets\images\characters\takiOld.xml',
+    r'assets\images\characters\takiFocus.xml',
     scale=1,
     flipX=false,
     flipY=false,
@@ -233,7 +234,7 @@ while (running) {
 
     animate.update(dt)
 
-    screen.fill((0, 0, 0))
+    screen.fill(bgcolor)
     screen.blit(animate.getFrame(), (position[0] - offset[0], position[1] - offset[1]))
     screen.blit(benchmark, position)
 

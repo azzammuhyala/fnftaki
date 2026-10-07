@@ -1,8 +1,8 @@
 import json
 import re
 
-CHART_PATH = r''
-RESULT_PATH = r''
+CHART_PATH = r'ex\double kill\normal.json'
+RESULT_PATH = r'ex\double kill\chart.csv'
 DIFFICULTY = 'hard'
 CONVERTER = 'Psych'
 OFFSET = 0
@@ -87,7 +87,7 @@ func converterFromVsliced(fn) {
     save(result, fn)
 }
 
-func converterFromOtherPsych(fn) {
+func converterFromCodename(fn) {
     dataChart = load()
 
     result = []

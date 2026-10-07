@@ -1,0 +1,10 @@
+# pip install moviepy
+import moviepy as m
+
+inst = m.AudioFileClip('assets/songs/markov/Inst.ogg')
+voices = m.AudioFileClip('assets/songs/markov/Voices.ogg')
+
+m.CompositeAudioClip([inst.with_start(0), voices.with_start(0)]).write_audiofile('music.ogg')
+
+inst.close()
+voices.close()

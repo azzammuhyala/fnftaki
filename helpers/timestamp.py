@@ -27,7 +27,7 @@ import pygame
 # CONFIG
 # ==========================
 
-PATH = r"assets/songs/crucify anniversary"
+PATH = r"assets/songs/come along with me"
 
 SONG = PATH + "/music.ogg"
 CHART = PATH + "/chart.csv"
@@ -119,7 +119,7 @@ notes = load_notes(CHART)
 note_times = [n[1] for n in notes]  # daftar waktu terurut, dipakai untuk bisect
 
 if notes:
-    song_length = max(n[1] + n[2] for n in notes) + 3000
+    song_length = max(n[1] + n[2] for n in notes) + 60_000
 else:
     print("[WARN] Chart kosong, memakai panjang default 60 detik.")
     song_length = 60_000
@@ -286,7 +286,7 @@ def draw_slider():
 
 
 def draw_header():
-    txt = font_big.render(format_time(current_time), True, TEXT_COLOR)
+    txt = font_big.render(f'{format_time(current_time)} ({current_time} ms)', True, TEXT_COLOR)
     screen.blit(txt, (20, 8))
 
     status = "PLAYING" if playing else "PAUSED"
@@ -409,8 +409,8 @@ def main():
                 handle_mousemotion(event)
 
         screen.fill(BG_COLOR)
-        draw_header()
         draw_notes()
+        draw_header()
         draw_slider()
         draw_footer()
         pygame.display.flip()

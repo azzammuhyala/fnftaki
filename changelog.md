@@ -1,18 +1,14 @@
 # Change Logs
-- UI improvements.
-- Optimization improvements.
-- Zoom mechanism added.
-- Sprite animation improvements.
-- Scores improvements.
-- Removed the song 'Hallow' (there was a mechanic that couldn't be implemented here).
-- Added the song 'Crucify Sarvente'.
-- Added the song 'Genocide'.
-- Added middle scrolling.
-- Replaced hyphens (`-`) in song names with spaces (` `).
-- Removed `SONG_NAME` with `#` and `*` (removed because a memory leak issue, so only one song could be played at a time).
-- Added debug information for memory consumption.
-- Added several options.
-- Added new combo breaks score information.
-- Added new stages and characters.
-- Added custom events written in scripts.
+- Added new songs: `markov` and `come along with me`.
+- Fixed a visual bug where hit notes would glitch due to too many notes appearing in close succession.
+- The note `Confirm` animation state no longer loops.
+- Minor and major fixes applied to several older songs.
+- Used `ascii` encoding for reading note charts.
+- Used `sys.encoding` (default is `utf-8`) for reading metadata and scripts.
+- The `scoreFormat` now passes explicit keyword arguments instead of just positional arguments.
+- Slight changes to the score format.
+- Default scroll speed set to 1.4x.
+- Added a key binding to toggle fullscreen.
+- Added a `default` note style.
+- Minimum PyScript version set to **1.14.0**.
 - Etc.

@@ -1,15 +1,15 @@
-from time import sleep
+from fpstimer import fpstimer
 
 # install: `pip install keyboard`
 from keyboard import press, release
 
-print('Ready!')
+print('Running!')
 while (1) {
     press('a')
     press('s')
     press('w')
     press('d')
-    sleep(0.166)
+    fpstimer.tick(10)
     release('a')
     release('s')
     release('w')

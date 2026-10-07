@@ -1,0 +1,6 @@
+import pygame
+
+bg = pygame.image.load(r'imported\churchInfected.png')
+bg = bg.subsurface((5, 5, bg.get_width() - 10, bg.get_height() - 10))
+bg = pygame.transform.smoothscale(bg, (1280, 720))
+pygame.image.save(bg, 'assets/images/backgrounds/churchInfected.png')

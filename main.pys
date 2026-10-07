@@ -33,17 +33,7 @@ for (k, v of dict.items({
 }
 del l, k, v
 
-import 'xml.etree.ElementTree' as xmlTree
-import _pyscript
-import pathlib
-import pygame
-import random
-import jsdict
-import json
-import time
-import csv
-import sys
-import os
+import 'xml.etree.ElementTree' as xmlTree, _pyscript, pathlib, pygame, random, jsdict, json, time, csv, sys, os
 
 # optional, to see the memory used (install: `pip install psutil`)
 try import psutil except {psutil = none}
@@ -85,9 +75,7 @@ TOUCH_BUTTON = (
     {direction: 'right', color: (255, 0, 0)}
 )
 
-FUNCTION_EVENTS = frozenset([
-    'onStart', 'onEnd', 'onClose', 'onQuit', 'onHit', 'onMiss', 'onRelease', 'onUpdate'
-])
+FUNCTION_EVENTS = frozenset(['onStart', 'onEnd', 'onClose', 'onQuit', 'onHit', 'onMiss', 'onRelease', 'onUpdate'])
 
 GAME_RESOLUTION = (1280, 720)
 TABLE_WIDTH = 50
@@ -143,7 +131,7 @@ func loadNotes(path, reverse=false) {
     map = map
     int = int
 
-    with (open(path, 'r') as file)
+    with (open(path, 'r', encoding='ascii') as file)
         notes = tuple(csv.reader(file))
 
     totalNotes = len(notes)
@@ -157,8 +145,8 @@ func loadNotes(path, reverse=false) {
 
                 note = tuple(map(int, note))
                 character, direction = getNoteId(note[0])
-                time = int(note[1])
-                length = len(note) == 3 ? max(int(note[2]), 0) : 0
+                time = note[1]
+                length = len(note) >= 3 ? max(note[2], 0) : 0
                 end = time + length
 
                 return {
@@ -281,12 +269,11 @@ func fixOffsets(sprite, animation) {
 }
 
 timeFormat = '{}:{:02d}.{:03d}'.format
-func getFormatTime(milliseconds)
-    => timeFormat(
-        milliseconds // 60000,
-        milliseconds % 60000 // 1000,
-        milliseconds % 1000
-    )
+func getFormatTime(milliseconds) => timeFormat(
+    milliseconds // 60000,
+    milliseconds % 60000 // 1000,
+    milliseconds % 1000
+)
 
 class SoundManager {
 
@@ -333,7 +320,7 @@ class Sprite {
         self.antiAliasing = bool(antiAliasing)
         self.isAnimation = bool(isAnimation)
         self.configuration = xmlTree.parse(path).getroot()
-        self.sprite = loadImage(os.path.dirname(path) + '/' + self.configuration.get('imagePath'))
+        self.sprite = pygame.image.load(os.path.join(os.path.dirname(path), self.configuration.get('imagePath')))
     }
 
     func getNames(self)
@@ -377,7 +364,7 @@ class Sprite {
                 frameHeight = int(subtexture.get('frameHeight', height))
 
                 frame = pygame.Surface((frameWidth, frameHeight), pygame.SRCALPHA)
-                frame.blit(self.sprite.subsurface(x, y, width, height), (-frameX, -frameY))
+                frame.blit(self.sprite, (-frameX, -frameY), (x, y, width, height))
                 if (self.scale != 1)
                     frame = scaleFunction(frame, (frameWidth * self.scale, frameHeight * self.scale))
                 if (self.flipX || self.flipY)
@@ -459,20 +446,21 @@ class Character {
         self.updateData()
     }
 
+    @staticmethod
+    func _aboveOne(v) => len(v) > 1
+
+    func _hasState(self)
+        => any(map(self._aboveOne, self.states.values()))
+
     func updateData(self) {
         self.character.frames = self.data.characterFrames.idle
         self.character.loop = true
 
         if (self.data.hasOwnNote) {
-            self.notes[0].frames = self.data.noteFrames.left
-            self.notes[0].loop = true
-            self.notes[1].frames = self.data.noteFrames.down
-            self.notes[1].loop = true
-            self.notes[2].frames = self.data.noteFrames.up
-            self.notes[2].loop = true
-            self.notes[3].frames = self.data.noteFrames.right
-            self.notes[3].loop = true
-
+            for (i, direction of enumerate(('left', 'down', 'up', 'right'))) {
+                self.notes[i].frames = getattr(self.data.noteFrames, direction)
+                self.notes[i].loop = true
+            }
             x, y = self.data.notePosition
             for (i of range(4))
                 self.notePositions[i] = (x + 105 * i, y)
@@ -496,16 +484,16 @@ class Character {
 
     func hit(self, direction, success=true, changeCharacter=true, changeNote=true) {
         if (direction -> self.states)
-            return
-
-        self.states[direction] = none
+            self.states[direction][0] += 1
+        else
+            self.states[direction] = [1]
 
         if (changeCharacter) {
             state = success ? direction : direction + 'Miss'
             frames = self.data.characterFrames[state]
             self.character.frames = frames
             self.character.loop = self.data.loopPose || state == 'idle'
-            self.states[direction] = (state, frames)
+            self.states[direction][1:2] = [state, frames]
             self.state = state
             self.changeIdle = false
         }
@@ -513,19 +501,22 @@ class Character {
         if (self.data.hasOwnNote && changeNote && direction -> NOTES_INDEX) {
             note = self.notes[NOTES_INDEX[direction]]
             note.frames = self.data.noteFrames[direction + (success ? 'Confirm' : 'Press')]
-            note.loop = success
+            note.loop = false  # success
         }
     }
 
     func release(self, direction) {
-        if (direction !> self.states)
-            return
-
-        self.states.pop(direction, none)
+        if (!BOT_PLAY && self.data.name == 'player')
+            self.states.pop(direction, none)
+        elif (direction -> self.states) {
+            self.states[direction][0] -= 1
+            if (self.states[direction][0] <= 0)
+                self.states.pop(direction, none)
+        }
 
         for (state of self.states.values()) {
-            if (state) {
-                state, frames = state
+            if (len(state) > 1) {
+                _, state, frames = state
                 self.character.frames = frames
                 self.character.loop = self.data.loopPose || state == 'idle'
                 self.state = state
@@ -533,20 +524,28 @@ class Character {
             }
         }
 
-        if (self.data.hasOwnNote && direction -> NOTES_INDEX) {
+        if (self.data.hasOwnNote && direction -> NOTES_INDEX && direction !> self.states) {
             note = self.notes[NOTES_INDEX[direction]]
             note.frames = self.data.noteFrames[direction]
             note.loop = true
         }
 
-        if (!(self.state == 'idle' || self.changeIdle || any(self.states.values()))) {
+        if (!(
+            self.state == 'idle' ||
+            self.changeIdle ||
+            self._hasState()
+        )) {
             self.timeToIdle = pygame.mixer.music.get_pos() + CHANGE_TO_IDLE
             self.changeIdle = true
         }
     }
 
     func update(self, deltaTime) {
-        if (self.changeIdle && !any(self.states.values()) && pygame.mixer.music.get_pos() >= self.timeToIdle) {
+        if (
+            self.changeIdle &&
+            !self._hasState() &&
+            pygame.mixer.music.get_pos() >= self.timeToIdle
+        ) {
             self.character.frames = self.data.characterFrames.idle
             self.character.loop = true
             self.state = 'idle'
@@ -561,12 +560,11 @@ class Character {
                 note.update(deltaTime)
     }
 
-    func draw(self, blitFunction) {
+    func draw(self, blitFunction)
         if (self.data.visible) {
             character = self.character
             blitFunction(character._frames[character.currentIndex], self.positions[self.state])
         }
-    }
 
 }
 
@@ -592,8 +590,8 @@ class Game {
         os.environ['SDL_RENDER_SCALE_QUALITY'] = ANTI_ALIASING ? '1' : '0'
 
         pygame.init()
-        pygame.display.set_allow_screensaver(True)
-        pygame.event.set_grab(True)
+        pygame.display.set_allow_screensaver(true)
+        pygame.event.set_grab(true)
 
         self.screen = pygame.display.set_mode(
             GAME_RESOLUTION,
@@ -603,7 +601,7 @@ class Game {
         self.running = true
         self.gameOver = false
 
-        with (open(modPath / 'metadata.json', 'r') as file)
+        with (open(modPath / 'metadata.json', 'r', encoding=sys.encoding) as file)
             self.metadata = jsdict.jsdict(json.load(file))
 
         random.seed(self.metadata.name)
@@ -619,7 +617,7 @@ class Game {
 
         self.stage = stage = STAGES[self.metadata.stage]
 
-        self.scrollSpeed = stage.notes.speed ?? 1.25
+        self.scrollSpeed = stage.notes.speed ?? 1.4
         self.hasViewer = stage.viewer is not none
         self.hasOverlay = stage.background.overlay is not none
 
@@ -627,8 +625,9 @@ class Game {
 
         if (self.metadata.script is not none) {
             scriptPath = modPath / self.metadata.script
-            with (open(scriptPath, 'r', encoding='utf-8') as file)
-                exec(_pyscript.buffer.PysFileBuffer(file.read(), str(scriptPath.resolve())), self.scriptGlobals)
+            with (open(scriptPath, 'r', encoding=sys.encoding) as file)
+                buffer = _pyscript.buffer.PysFileBuffer(file, str(scriptPath.resolve()))
+            exec(buffer, self.scriptGlobals)
         }
 
         screenWidth, screenHeight = GAME_RESOLUTION
@@ -815,7 +814,7 @@ class Game {
             iconFrames: {
                 normal: opponentIcon.split('normal')[0],
                 losing: opponentIcon.split('losing')[0],
-                winning: (winning := opponentIcon.split('winning')) ? winning[0] : none,
+                winning: (winning := opponentIcon.split('winning')) ? winning[0] : none
             },
             healthBarColor: stage.opponent.character.healthBar.color,
             loopPose: stage.opponent.character.loopPose,
@@ -866,7 +865,7 @@ class Game {
             iconFrames: {
                 normal: playerIcon.split('normal')[0],
                 losing: playerIcon.split('losing')[0],
-                winning: (winning := playerIcon.split('winning')) ? winning[0] : none,
+                winning: (winning := playerIcon.split('winning')) ? winning[0] : none
             },
             healthBarColor: stage.player.character.healthBar.color,
             vocalMiss: MISS_SOUND ? pygame.mixer.Sound(
@@ -960,8 +959,9 @@ class Game {
 
         if (ZOOM)
             self.zoom = {
+                onSing: stage.zoomOnSing ?? true,
                 impulse: 0.02,
-                maximum: 1.3,
+                maximum: 1.5,
                 current: 1.0,
                 timeAccumulator: 0
             }
@@ -971,7 +971,7 @@ class Game {
 
         self.chunkNotes = []
         self.activeNotes = []
-        self.unpauseGained = True
+        self.unpauseGained = true
 
         self.scoreInfo = {
             health: 0.5,
@@ -1167,8 +1167,8 @@ class Game {
         self.subtitle.timeToDisappear = pygame.mixer.music.get_pos() + time
     }
 
-    func zoomBeat(self) {
-        if (ZOOM) {
+    func zoomBeat(self, sing=false) {
+        if (ZOOM && (!sing || self.zoom.onSing)) {
             self.zoom.current += self.zoom.impulse
             self.zoom.timeAccumulator = 0
         }
@@ -1211,7 +1211,7 @@ class Game {
                 self.activeNotes.append(note)
                 self.player.hit(direction)
                 self.setPlayerVocalVolume(1)
-                self.zoomBeat()
+                self.zoomBeat(true)
                 if (SINGLE_NOTE_PER_INPUT)
                     break
             }
@@ -1322,8 +1322,8 @@ class Game {
                 shit.context.symbol_table.symbols.clear()
             shit.context = none
             shit.position = none
-            shit = none
         }
+        del shit
 
         # for fast lookup
         QUIT = pygame.QUIT
@@ -1345,7 +1345,7 @@ class Game {
         scoreBottom = screenHeight - 10
         zeroPosition = (0, 0)
         informationPosition = (10, 10)
-        screenRect = pygame.Rect((0, 0), GAME_RESOLUTION)
+        screenRect = pygame.Rect(0, 0, screenWidth, screenHeight)
         pauseRect = self.pauseRect
         healthRect = pygame.Rect(0, screenHeight - 80, 700, 20)
         healthRect.centerx = screenRect.centerx
@@ -1397,7 +1397,7 @@ class Game {
             getFPS = self.clock.get_fps
             infoFormat = 'FPS: {:.0f}\n'
             if (psutil is none) {
-                func getMemory() => 'Unknown'
+                func getMemory() => 'UNKNOWN'
                 infoFormat += 'Memory: {}'
             } else {
                 memoryInfo = psutil.Process(os.getpid()).memory_info
@@ -1412,11 +1412,11 @@ class Game {
         }
         self.scoreFormat = (
             'Song: {} '.format(songName) + (
-            '[{}]\n'
-            'Score: {:,}\n'
-            'Accuracy: {:.2f}% [{}]\n'
-            'Combo: {:,} - Max: {:,} - Breaks: {:,}\n'
-            'Sick: {:,}\nGood: {:,}\nBad: {:,}\nShit: {:,}\nMisses: {:,}'
+            '[{time}]\n'
+            'Score: {score:,}\n'
+            'Accuracy: {accuracy:.2f}% [{rating}]\n'
+            'Combo: {combo:,} - Max: {maxCombo:,} - Breaks: {comboBreaks:,}\n'
+            'Sick: {sick:,} | Good: {good:,}\nBad: {bad:,} | Shit: {shit:,}\nMisses: {miss:,}'
         )).format
         scoreInfo = self.scoreInfo
         background = self.background
@@ -1490,10 +1490,10 @@ class Game {
 
                 elif (eventType == WINDOWFOCUSLOST) {
                     if (soundManager.isPaused)
-                        self.unpauseGained = False
+                        self.unpauseGained = false
                     else {
                         soundManager.pause()
-                        self.unpauseGained = True
+                        self.unpauseGained = true
                     }
                 }
 
@@ -1507,6 +1507,8 @@ class Game {
                         key = KEYS_BINDING[event.key]
                         if (key == 'pause')
                             soundManager.togglePause()
+                        elif (key == 'fullscreen')
+                            pygame.display.toggle_fullscreen()
                         elif (key == 'screenshot') {
                             fileName = '{} - {}.png'.format(songName, currentTime)
                             pygame.image.save(mainScreen, fileName)
@@ -1619,7 +1621,7 @@ class Game {
                 note = getChunkNote(indexNote)
                 direction = note.direction
 
-                # notes/scroll handler
+                # notes handler
 
                 if (!note.started && currentTime >= note.time) {
                     if (note.character == 'opponent') {
@@ -1628,9 +1630,9 @@ class Game {
                         note.pressed = true
                         note.pressing = true
                         opponent.hit(direction)
-                        if (hasViewer && viewerData.canFear)
+                        if (hasViewer && viewerData.canFear && 'fear' !> viewer.states)
                             viewer.hit('fear')
-                        self.zoomBeat()
+                        self.zoomBeat(true)
                     }
 
                     elif (BOT_PLAY) {
@@ -1639,7 +1641,7 @@ class Game {
                         note.pressed = true
                         note.pressing = true
                         player.hit(direction)
-                        self.zoomBeat()
+                        self.zoomBeat(true)
                     }
 
                     elif (!note.pressed && currentTime >= note.timeMiss) {
@@ -1662,7 +1664,7 @@ class Game {
                         self.decreaseHealth(byOpponent=true)
                         opponent.release(direction)
                         # the viewer will only release the fear pose when the opponent has no more state.
-                        if (hasViewer && viewerData.canFear && !any(opponent.states.values()))
+                        if (hasViewer && viewerData.canFear && !opponent._hasState())
                             viewer.release('fear')
                     }
 
@@ -1755,15 +1757,15 @@ class Game {
             scoreSurface = renderWithLine(
                 self.scoreFont.render,
                 self.scoreFormat(
-                    getFormatTime(currentTime),
-                    scoreInfo.score,
-                    scoreInfo.accuracy, scoreInfo.rating,
-                    scoreInfo.combo, scoreInfo.maxCombo, scoreInfo.comboBreaks,
-                    scoreInfo.sick,
-                    scoreInfo.good,
-                    scoreInfo.bad,
-                    scoreInfo.shit,
-                    scoreInfo.miss
+                    time=getFormatTime(currentTime),
+                    score=scoreInfo.score,
+                    accuracy=scoreInfo.accuracy, rating=scoreInfo.rating,
+                    combo=scoreInfo.combo, maxCombo=scoreInfo.maxCombo, comboBreaks=scoreInfo.comboBreaks,
+                    sick=scoreInfo.sick,
+                    good=scoreInfo.good,
+                    bad=scoreInfo.bad,
+                    shit=scoreInfo.shit,
+                    miss=scoreInfo.miss
                 ),
                 whiteColor,
                 antiAliasing=ANTI_ALIASING
@@ -1794,6 +1796,7 @@ class Game {
                 screenRect.size = [screenWidth * zoom.current, screenHeight * zoom.current]
                 screenRect.center = screenCenter
 
+                # all
                 blitMainScreen(scaleFunction(screen, screenRect.size), screenRect)
             }
 
@@ -1807,6 +1810,7 @@ class Game {
                     blitMainScreen(button.surface, button.rect)
 
             if (subtitle.surface is not none) {
+                # subtitle
                 blitMainScreen(subtitle.surface, subtitle.rect)
                 if (subtitle.timeToDisappear <= currentTime)
                     subtitle.surface = none
