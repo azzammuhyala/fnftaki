@@ -1,11 +1,11 @@
 import json
 import re
 
-CHART_PATH = r'ex\double kill\normal.json'
-RESULT_PATH = r'ex\double kill\chart.csv'
+CHART_PATH = r'imported\Unknown-Crucify.json'
+RESULT_PATH = r'assets\songs\unknown crucify\chart.csv'
+EGINE = 'Psych'
 DIFFICULTY = 'hard'
-CONVERTER = 'Psych'
-OFFSET = 0
+OFFSET = 400
 
 func load()
     with (open(CHART_PATH, 'r') as file)
@@ -19,7 +19,6 @@ func save(notes, fn) {
 
 func converterFromPsych(fn) {
     dataChart = load()
-
     result = []
     registered = set()
 
@@ -42,10 +41,8 @@ func converterFromPsych(fn) {
         if (note in registered)
             continue
         registered.add(note)
-
-        note = [idDirection, time]
         if (length > 0)
-            note.append(length)
+            note += (length,)
 
         result.append(note)
     }
@@ -55,7 +52,6 @@ func converterFromPsych(fn) {
 
 func converterFromVsliced(fn) {
     dataChart = load()
-
     result = []
     registered = set()
 
@@ -76,10 +72,8 @@ func converterFromVsliced(fn) {
         if (note in registered)
             continue
         registered.add(note)
-
-        note = [idDirection, time]
         if (length > 0)
-            note.append(length)
+            note += (length,)
 
         result.append(note)
     }
@@ -112,10 +106,8 @@ func converterFromCodename(fn) {
         if (note in registered)
             continue
         registered.add(note)
-
-        note = [idDirection, time]
         if (length > 0)
-            note.append(length)
+            note += (length,)
 
         result.append(note)
     }
@@ -123,6 +115,6 @@ func converterFromCodename(fn) {
     save(result, fn)
 }
 
-locals()['converterFrom' + CONVERTER.strip()](
+locals()['converterFrom' + EGINE.strip()](
     func(result) => '\n'.join(comprehension(result, func(note) => ','.join(map(repr, note))))
 )

@@ -34,11 +34,8 @@ for (k, v of dict.items({
 del l, k, v
 
 import 'xml.etree.ElementTree' as xmlTree, _pyscript, pathlib, pygame, random, jsdict, json, time, csv, sys, os
-
 # optional, to see the memory used (install: `pip install psutil`)
 try import psutil except {psutil = none}
-
-IS_PYGAMECE = hasattr(pygame, 'system')
 
 NOTES_INDEX = dict(
     left=0,
@@ -194,9 +191,9 @@ func renderWithLine(fontRender, text, color, backgroundColor=none, alignment='le
 
     for (textSurface of surfaces)
         y += blit(textSurface, [match (alignment) {
-            'left': 0,
-            'center': (width - textSurface.get_width()) // 2,
-            'right': width - textSurface.get_width()
+            case 'left': 0,
+            case 'center': (width - textSurface.get_width()) // 2,
+            case 'right': width - textSurface.get_width()
         }, y]).height
 
     return surface
@@ -588,6 +585,12 @@ class Game {
             throw FileNotFoundError('song "{}" not found'.format(modPath.resolve()))
 
         os.environ['SDL_RENDER_SCALE_QUALITY'] = ANTI_ALIASING ? '1' : '0'
+        try
+            pygame.mixer.init()
+        except {
+            print('WARNING: Audio mixer could not be initialized.', file=sys.stderr)
+            os.environ['SDL_AUDIODRIVER'] = 'dummy'
+        }
 
         pygame.init()
         pygame.display.set_allow_screensaver(true)
@@ -1343,8 +1346,6 @@ class Game {
         songName = self.metadata.name
         visibleOpponentNote = !MIDDLE_SCROLL
         scoreBottom = screenHeight - 10
-        zeroPosition = (0, 0)
-        informationPosition = (10, 10)
         screenRect = pygame.Rect(0, 0, screenWidth, screenHeight)
         pauseRect = self.pauseRect
         healthRect = pygame.Rect(0, screenHeight - 80, 700, 20)
@@ -1353,8 +1354,6 @@ class Game {
         screenCenter = screenRect.center
         healthBarCenterY = healthRect.centery
         healthBarWidth = healthRect.width
-        whiteColor = (255, 255, 255)
-        blackColor = (0, 0, 0)
         opponentNotesRect = [none] * 4
         playerNotesRect = [none] * 4
         getOpponentNoteRect = opponentNotesRect.__getitem__
@@ -1468,6 +1467,7 @@ class Game {
         pygame.display.set_caption(songName)
         print('Now playing "{}"{}...{}'.format(songName, HARD ? ' in hard mode' : '', BOT_PLAY ? ' (BOT PLAY)' : ''))
         self.playMusic()
+        tick(FPS)
 
         while (self.running && getBusy()) {
             deltaTime = tick(FPS)
@@ -1538,7 +1538,7 @@ class Game {
             playerUpdate(deltaTime)
 
             # background
-            blitScreen(background._frames[background.currentIndex], zeroPosition)
+            blitScreen(background._frames[background.currentIndex], (0, 0))
 
             # characters
             if (hasViewer) {
@@ -1742,7 +1742,7 @@ class Game {
             # health bar
             drawRect(screen, playerData.healthBarColor, healthRect)
             drawRect(screen, opponentData.healthBarColor, healthOpponentRect)
-            drawRect(screen, blackColor, healthRect, 5)
+            drawRect(screen, (0, 0, 0), healthRect, 5)
 
             # icons
             blitScreen(
@@ -1767,7 +1767,7 @@ class Game {
                     shit=scoreInfo.shit,
                     miss=scoreInfo.miss
                 ),
-                whiteColor,
+                (255, 255, 255),
                 antiAliasing=ANTI_ALIASING
             )
             scoreSurfaceRect = scoreSurface.get_rect(left=10, bottom=scoreBottom)
@@ -1802,7 +1802,7 @@ class Game {
 
             if (self.hasOverlay)
                 # overlay
-                blitMainScreen(self.overlay, zeroPosition)
+                blitMainScreen(self.overlay, (0, 0))
 
             if (visibleButtonNote)
                 # mobile notes
@@ -1835,15 +1835,15 @@ class Game {
                 infoSurface = renderWithLine(
                     informationFontRender,
                     infoFormat(getFPS(), getMemory()),
-                    whiteColor,
-                    blackColor,
+                    (255, 255, 255),
+                    (0, 0, 0),
                     antiAliasing=ANTI_ALIASING
                 )
 
                 infoSurface.set_alpha(150)
 
                 # info
-                blitMainScreen(infoSurface, informationPosition)
+                blitMainScreen(infoSurface, (10, 10))
             }
 
             # refresh screen

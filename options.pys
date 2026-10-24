@@ -1,17 +1,16 @@
-# Source mod: https://gamebanana.com/mods/615737, https://gamebanana.com/mods/425462 (Bad Nun),
-#             https://gamebanana.com/mods/332345 and
-#             https://www.youtube.com/watch?v=vqZWYbdyr1U, and
-#             https://gamejolt.com/games/fnf-ruvstyle-collection/717914 (Monochrome - Taki version),
-#             https://gamebanana.com/mods/310465 (Prayer),
+# Source mod: https://gamebanana.com/mods/615737; https://gamebanana.com/mods/425462 (Bad Nun);
+#             https://gamebanana.com/mods/332345, https://www.youtube.com/watch?v=vqZWYbdyr1U, and
+#             https://gamejolt.com/games/fnf-ruvstyle-collection/717914 (Monochrome - Taki version);
+#             https://gamebanana.com/mods/310465 (Prayer);
 #             https://gamebanana.com/mods/336064, and
-#             https://gamejolt.com/games/AnnivesaryMod/660780 (Crucify and Bazinga Anniversary),
-#             https://gamebanana.com/mods/321357 (Crucify Sarvente),
+#             https://gamejolt.com/games/AnnivesaryMod/660780 (Crucify and Bazinga Anniversary);
+#             https://gamebanana.com/mods/321357 (Crucify Sarvente);
 #             https://www.youtube.com/watch?v=QMACpceDb_Y (Genocide - Taki vs Nikusa version),
-#             https://gamebanana.com/mods/336348 (Tabi), and https://gamebanana.com/mods/284934 (Entity),
-#             https://gamebanana.com/mods/404602 (Markov - Taki version),
+#             https://gamebanana.com/mods/336348 (Tabi), and https://gamebanana.com/mods/284934 (Entity);
+#             https://gamebanana.com/mods/404602 (Markov - Taki version);
 #             https://www.youtube.com/watch?v=f_-CuL9XS-M, and
 #             https://www.mediafire.com/file/ewawekf42oiotk3/Come+along+w+me.zip/file (Come Along With Me -
-#             Taki version)
+#             Taki version); https://gamebanana.com/mods/407693 (Unknown Crucifixion)
 # License mod: Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License.
 # Credit mod: Chewilly11, CesarFever, Mako, Tea, Foodieti, isophoro, Rifxii, FPLester, Biddle, BirdBonanza, Roll,
 #             Circle, HyphaeShade, Kip, Winkel, MegaFreedom, Peakek, Vai, Pancho, Della, Vortmite, EMG, Zarrene, Leo,
@@ -21,8 +20,8 @@
 #             SandPlanet, bubba, ninjamuffin99, PhantomArcade, evilsk8r, kawaisprite, Alonso599, Dokki.doodlez,
 #             nota_nota, Blantados, Starrilia, SugarRatio, Homskiy, Tenzubushi, Gersgard, Cougar MacDowall, Dicartal,
 #             Angelattes, AmazeinG666, Elemenopee, Direlinqqed, SadSamuraiMan, bbpanzu, MikeGeno, aus_si, P.GOD,
-#             ChromaSen, TAEYAI, RIVEREN, Yoshubs, TheDragShot, deivid36, Tern0i, Matt$, DusterBuster, Walsengipa, 
-#             [and more...]
+#             ChromaSen, TAEYAI, RIVEREN, Yoshubs, TheDragShot, deivid36, Tern0i, Matt$, DusterBuster, Walsengipa,
+#             Electro chaos elemental, Bielms, SpeakerBossRapper_OFICIAL, [and more...]
 
 # Source code: https://github.com/azzammuhyala/fnftaki
 # License code: MIT
@@ -34,8 +33,8 @@
 #             I ONLY created the my own engine code from scratch. By the way, i'm a fan of Taki!
 
 # Available songs: 'bazinga', 'crucify', 'prayer', 'bad nun', 'feel the rage', 'bazinga anniversary',
-#                  'crucify anniversary', 'crucify sarvente', 'genocide', 'monochrome', 'markov' (NEW),
-#                  'come along with me' (NEW)
+#                  'crucify anniversary', 'crucify sarvente', 'genocide', 'monochrome', 'markov', 'come along with me',
+#                  'unknown crucifixion' (NEW)
 
 if (__name__ == '__main__')
     throw Exception("Oops! You've executed the wrong script file, try main.pys instead!")
@@ -43,10 +42,10 @@ import 'pygame.constants' as pgc
 
 # ----------------------------------------------------- OPTIONS ------------------------------------------------------ #
 
-# NOTE: 1 is true (enabled); 0 is false (disabled)
+# NOTE: 1 is true (enabled), 0 is false (disabled)
 
 # You can change the song here according to the available song name:
-SONG_NAME = 'crucify'
+SONG_NAME = ''
 # Set maximum FPS (integer):
 FPS = 60
 # Show debug info:

@@ -15,7 +15,7 @@ TARGET_SOURCES = (
 )
 
 PARENT_NAME = 'fnftaki'
-OUTPUT_NAME = 'taki-v2.1.0.zip'
+OUTPUT_NAME = 'taki-v2.2.0.zip'
 
 PNG_IGNORED_CHUNKS = (b'tEXt', b'zTXt', b'iTXt', b'eXIf')
 TTF_IDS_TO_REMOVE = (0, 7, 8, 9, 10, 11, 12, 13, 14)

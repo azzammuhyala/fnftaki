@@ -5,9 +5,9 @@
     <br>
     <img src="previews/Crucify - 12207.webp" alt="Preview" height="300">
     <br>
-    <img src="previews/Markov - 47092.webp" alt="Preview" height="300">
+    <img src="previews/Unknown Crucifixion - 2931.webp" alt="Preview" height="300">
     <br>
-    <img src="previews/Come Along With Me - 55827.webp" alt="Preview" height="300">
+    <img src="previews/Unknown Crucifixion - 20947.webp" alt="Preview" height="300">
 </div>
 
 I just made **Taki** ~~VS Demon Fever~~ **FNF** using PyScript and PyGame library. This game is quite simple, with only
@@ -17,8 +17,8 @@ heavy for that.
 
 ## Requirements
 - Python (above `3.10`)
-- PyScript `pip install pyscript-programming-language` (above `1.14.0`)
-- PyGame `pip install pygame` or `pip install pygame-ce`
+- PyScript `pip install pyscript-programming-language` (above `1.15.0.dev1`)
+- PyGame `pip install pygame` or `pip install pygame-ce` (above `2.1.2`)
 
 ## Run the game
 Execute this command (run the file `main.pys` with pyscript interpreter):
@@ -35,10 +35,10 @@ or **Pydroid 3**. After that, you need to install the required libraries. Once t
 the Python code below. `GAME_PATH` is the game's folder, which contains the `main.pys` file and the `assets/` folder
 required by the game.
 ```py
-# WARNING: Make sure you're using PyScript>=1.14.0
+# WARNING: Make sure you're using PyScript>=1.15.0.dev1
 
 # Your game folder:
-GAME_PATH = r'/storage/emulated/0/Download/taki-v2.1.0/fnftaki'
+GAME_PATH = r'/storage/emulated/0/Download/taki-v2.2.0/fnftaki'
 
 import os
 

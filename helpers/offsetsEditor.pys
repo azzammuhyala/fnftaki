@@ -42,7 +42,7 @@ class Sprite {
         self.antiAliasing = bool(antiAliasing)
         self.isAnimation = bool(isAnimation)
         self.configuration = xmlTree.parse(path).getroot()
-        self.sprite = loadImage(os.path.dirname(path) + '/' + self.configuration.get('imagePath'))
+        self.sprite = pygame.image.load(os.path.join(os.path.dirname(path), self.configuration.get('imagePath')))
     }
 
     func getNames(self)
@@ -86,7 +86,7 @@ class Sprite {
                 frameHeight = int(subtexture.get('frameHeight', height))
 
                 frame = pygame.Surface((frameWidth, frameHeight), pygame.SRCALPHA)
-                frame.blit(self.sprite.subsurface(x, y, width, height), (-frameX, -frameY))
+                frame.blit(self.sprite, (-frameX, -frameY), (x, y, width, height))
                 if (self.scale != 1)
                     frame = scaleFunction(frame, (frameWidth * self.scale, frameHeight * self.scale))
                 if (self.flipX || self.flipY)
@@ -157,7 +157,7 @@ pygame.init()
 pygame.display.set_caption('Offsets Editor')
 
 running = True
-screen = pygame.display.set_mode((1280, 720))
+screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 
 bgcolor = (255, 255, 255)
 spriteSpeed = 41
@@ -166,7 +166,7 @@ state = 'idle'
 offsets = {}
 
 sprite = Sprite(
-    r'assets\images\characters\takiFocus.xml',
+    r'assets\images\characters\fever.xml',
     scale=1,
     flipX=false,
     flipY=false,

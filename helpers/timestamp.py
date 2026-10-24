@@ -27,7 +27,7 @@ import pygame
 # CONFIG
 # ==========================
 
-PATH = r"assets/songs/come along with me"
+PATH = r"assets\songs\unknown crucifixion"
 
 SONG = PATH + "/music.ogg"
 CHART = PATH + "/chart.csv"
@@ -67,7 +67,6 @@ LANE_COLORS = (
 # ==========================
 # LOAD CHART
 # ==========================
-
 
 def load_notes(path):
     """Baca chart.csv dengan aman. Baris yang rusak akan di-skip, bukan

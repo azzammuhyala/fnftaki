@@ -1,14 +1,6 @@
 # Change Logs
-- Added new songs: `markov` and `come along with me`.
-- Fixed a visual bug where hit notes would glitch due to too many notes appearing in close succession.
-- The note `Confirm` animation state no longer loops.
-- Minor and major fixes applied to several older songs.
-- Used `ascii` encoding for reading note charts.
-- Used `sys.encoding` (default is `utf-8`) for reading metadata and scripts.
-- The `scoreFormat` now passes explicit keyword arguments instead of just positional arguments.
-- Slight changes to the score format.
-- Default scroll speed set to 1.4x.
-- Added a key binding to toggle fullscreen.
-- Added a `default` note style.
-- Minimum PyScript version set to **1.14.0**.
+- Error handling for `pygame.mixer.init()`.
+- Fixes to character offset data for `fever`.
+- Added a new song: `Unknown Crucifixion`.
+- Updated minimum module versions: PyScript $\ge$ 1.15.0.dev1 and PyGame $\ge$ 2.1.2.
 - Etc.

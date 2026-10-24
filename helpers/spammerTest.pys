@@ -4,7 +4,7 @@ from fpstimer import fpstimer
 from keyboard import press, release
 
 print('Running!')
-while (1) {
+while (true) {
     press('a')
     press('s')
     press('w')
