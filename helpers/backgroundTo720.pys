@@ -1,5 +1,5 @@
 import pygame
 
-bg = pygame.image.load(r'imported\Desain tanpa judul.png')
+bg = pygame.image.load(r'imported\CircleYouCantRun.png')
 bg = pygame.transform.smoothscale(bg, (1280, 720))
-pygame.image.save(bg, 'assets/images/backgrounds/destruido.png')
+pygame.image.save(bg, 'assets/images/overlays/youCantRunCircle.png')

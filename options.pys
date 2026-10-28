@@ -10,7 +10,8 @@
 #             https://gamebanana.com/mods/404602 (Markov - Taki version);
 #             https://www.youtube.com/watch?v=f_-CuL9XS-M, and
 #             https://www.mediafire.com/file/ewawekf42oiotk3/Come+along+w+me.zip/file (Come Along With Me -
-#             Taki version); https://gamebanana.com/mods/407693 (Unknown Crucifixion)
+#             Taki version); https://gamebanana.com/mods/407693 (Unknown Crucifixion);
+#             https://gamebanana.com/mods/404100 (You Can't Run - Taki version)
 # License mod: Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License.
 # Credit mod: Chewilly11, CesarFever, Mako, Tea, Foodieti, isophoro, Rifxii, FPLester, Biddle, BirdBonanza, Roll,
 #             Circle, HyphaeShade, Kip, Winkel, MegaFreedom, Peakek, Vai, Pancho, Della, Vortmite, EMG, Zarrene, Leo,
@@ -21,20 +22,20 @@
 #             nota_nota, Blantados, Starrilia, SugarRatio, Homskiy, Tenzubushi, Gersgard, Cougar MacDowall, Dicartal,
 #             Angelattes, AmazeinG666, Elemenopee, Direlinqqed, SadSamuraiMan, bbpanzu, MikeGeno, aus_si, P.GOD,
 #             ChromaSen, TAEYAI, RIVEREN, Yoshubs, TheDragShot, deivid36, Tern0i, Matt$, DusterBuster, Walsengipa,
-#             Electro chaos elemental, Bielms, SpeakerBossRapper_OFICIAL, [and more...]
+#             Electro chaos elemental, Bielms, SpeakerBossRapper_OFICIAL, LTHS02, [and more...]
 
 # Source code: https://github.com/azzammuhyala/fnftaki
 # License code: MIT
 # Author code: AzzamMuhyala
 
-# GAME: All of Taki's songs writen on PyScript (A programming language written in Python) with no fnf egine.
+# GAME: All of Taki's songs writen on PyScript (A programming language written in Python) with no official fnf egine.
 #       See more about PyScript here: https://github.com/azzammuhyala/pyscript
-# DISCLAIMER: I DO NOT 100% own any assets such as characters, sounds, music, song charts, etc in this game.
+# DISCLAIMER: I DO NOT 100% own any assets such as characters, sounds, music, song charts, etc in this game/mod/egine.
 #             I ONLY created the my own engine code from scratch. By the way, i'm a fan of Taki!
 
 # Available songs: 'bazinga', 'crucify', 'prayer', 'bad nun', 'feel the rage', 'bazinga anniversary',
 #                  'crucify anniversary', 'crucify sarvente', 'genocide', 'monochrome', 'markov', 'come along with me',
-#                  'unknown crucifixion' (NEW)
+#                  'unknown crucifixion', 'you cant run' (NEW)
 
 if (__name__ == '__main__')
     throw Exception("Oops! You've executed the wrong script file, try main.pys instead!")

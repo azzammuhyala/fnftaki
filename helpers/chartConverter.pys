@@ -1,11 +1,11 @@
 import json
 import re
 
-CHART_PATH = r'imported\Unknown-Crucify.json'
-RESULT_PATH = r'assets\songs\unknown crucify\chart.csv'
+CHART_PATH = r'imported\you-cant-run-encore.json'
+RESULT_PATH = r'assets\songs\you cant run\chart.csv'
 EGINE = 'Psych'
 DIFFICULTY = 'hard'
-OFFSET = 400
+OFFSET = 0
 
 func load()
     with (open(CHART_PATH, 'r') as file)

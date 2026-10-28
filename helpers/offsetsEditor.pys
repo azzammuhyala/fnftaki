@@ -166,7 +166,7 @@ state = 'idle'
 offsets = {}
 
 sprite = Sprite(
-    r'assets\images\characters\fever.xml',
+    r'assets\images\characters\sarvente.xml',
     scale=1,
     flipX=false,
     flipY=false,

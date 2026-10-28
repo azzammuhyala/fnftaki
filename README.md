@@ -1,24 +1,25 @@
-# FNF Mod - Only with Taki's song!!
+# FNF Mod - Only with Taki's song (and cover)!!
 
 <div align="center">
-    <img src="previews/Crucify - 3091.webp" alt="Preview" height="300">
+    <img src="previews/Crucify - 3091.webp" alt="Preview1" height="300">
     <br>
-    <img src="previews/Crucify - 12207.webp" alt="Preview" height="300">
+    <img src="previews/Crucify - 12207.webp" alt="Preview2" height="300">
     <br>
-    <img src="previews/Unknown Crucifixion - 2931.webp" alt="Preview" height="300">
+    <img src="previews/You Can't Run - 18143.webp" alt="Preview3" height="300">
     <br>
-    <img src="previews/Unknown Crucifixion - 20947.webp" alt="Preview" height="300">
+    <img src="previews/You Can't Run - 59751.webp" alt="Preview4" height="300">
 </div>
 
 I just made **Taki** ~~VS Demon Fever~~ **FNF** using PyScript and PyGame library. This game is quite simple, with only
-12 songs and is ready to play without a main menu. If your device is quite low-end, i'm sure you won't even be able to
+14 songs and is ready to play without a main menu. If your device is quite low-end, i'm sure you won't even be able to
 reach 24 FPS (LOL). PyScript runs on top of Python also still using Tree Walk Interpreter too, which is quite slow and
 heavy for that.
 
 ## Requirements
-- Python (above `3.10`)
+- Python (above `3.10.0`)
 - PyScript `pip install pyscript-programming-language` (above `1.15.0.dev1`)
-- PyGame `pip install pygame` or `pip install pygame-ce` (above `2.1.2`)
+- PyGame `pip install pygame` (above `2.2.0`) or `pip install pygame-ce` (above `2.1.4`)
+- NumPy `pip install numpy`
 
 ## Run the game
 Execute this command (run the file `main.pys` with pyscript interpreter):
@@ -35,10 +36,8 @@ or **Pydroid 3**. After that, you need to install the required libraries. Once t
 the Python code below. `GAME_PATH` is the game's folder, which contains the `main.pys` file and the `assets/` folder
 required by the game.
 ```py
-# WARNING: Make sure you're using PyScript>=1.15.0.dev1
-
-# Your game folder:
-GAME_PATH = r'/storage/emulated/0/Download/taki-v2.2.0/fnftaki'
+# Game path:
+GAME_PATH = r'/storage/emulated/0/Download/taki-v2.3.0/fnftaki'
 
 import os
 

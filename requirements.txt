@@ -1,2 +1,3 @@
-pyscript-programming-language>=1.15.0.dev1
-pygame>=2.1.2  # or pygame-ce>=2.1.2
+pyscript-programming-language>=1.15.0
+pygame>=2.2.0  # or pygame-ce>=2.1.4
+numpy

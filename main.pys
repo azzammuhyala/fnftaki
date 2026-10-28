@@ -76,7 +76,7 @@ FUNCTION_EVENTS = frozenset(['onStart', 'onEnd', 'onClose', 'onQuit', 'onHit', '
 
 GAME_RESOLUTION = (1280, 720)
 TABLE_WIDTH = 50
-BAR_LENGTH = 20
+BAR_LENGTH = 29
 LERP_SPEED = 3.0
 SPRITE_SPEED = 41 # (24 FPS)
 HIT_WINDOW = 166
@@ -106,7 +106,7 @@ if (BEST_PERFORMANCE) {
     SHOW_RATINGS = false
 }
 
-# better than `func nothing(a=none, b=none);`.. right?
+# better than `func nothing(a=none, b=none);`, right..?
 pyimport('builtins').exec('def nothing(*args, **kwargs): pass', none, locals())
 
 func loadImage(path, size=none, antiAliasing=true) {
@@ -444,7 +444,8 @@ class Character {
     }
 
     @staticmethod
-    func _aboveOne(v) => len(v) > 1
+    func _aboveOne(v)
+        => len(v) > 1
 
     func _hasState(self)
         => any(map(self._aboveOne, self.states.values()))
@@ -877,8 +878,8 @@ class Game {
             healthAmount: stage.player.healthAmount ?? 0.02,
             healthMinimum: stage.player.healthMinimum ?? 0.05,
             healthMaximum: stage.player.healthMaximum ?? 1.0,
-            canHey: stage.player.character.canHey,
-            loopPose: stage.player.character.loopPose,
+            canHey: stage.player.character.canHey ?? false,
+            loopPose: stage.player.character.loopPose ?? false,
             hasOwnNote: true,
             visible: stage.player.visible ?? true,
             visibleNote: stage.player.visibleNote ?? true
@@ -895,8 +896,8 @@ class Game {
                     idle: viewer.split(animation.dancingBeat),
                     fear: viewer.split(animation.fear)
                 },
-                canFear: stage.viewer.character.canFear,
-                loopPose: stage.viewer.character.loopPose,
+                canFear: stage.viewer.character.canFear ?? false,
+                loopPose: stage.viewer.character.loopPose ?? false,
                 hasOwnNote: false,
                 visible: stage.viewer.visible ?? true
             })
@@ -1322,7 +1323,7 @@ class Game {
         )) {
             shit = shit.__code__
             if (hasattr(shit.context, 'symbol_table'))
-                shit.context.symbol_table.symbols.clear()
+                dict.clear(shit.context.symbol_table.symbols)
             shit.context = none
             shit.position = none
         }
@@ -1371,7 +1372,6 @@ class Game {
         getChunkNote = chunkNotes.__getitem__
         addChunkNote = chunkNotes.append
         popChunkNote = chunkNotes.pop
-        noteFrames = self.noteFrames
         subtitle = self.subtitle
         playSurface = self.pauseFrames.play
         pauseSurface = self.pauseFrames.pause
@@ -1442,7 +1442,7 @@ class Game {
         drawRect = pygame.draw.rect
         mainScreen = self.screen
         blitMainScreen = mainScreen.blit
-        screen = ZOOM ? pygame.Surface(GAME_RESOLUTION) : mainScreen
+        screen = ZOOM ? pygame.Surface(GAME_RESOLUTION).convert() : mainScreen
         blitScreen = screen.blit
         scoreBackground = self.scoreBackground
         backgroundUpdate = background.update
@@ -1530,7 +1530,6 @@ class Game {
                     elif (eventType == FINGERUP)
                         self.handleMobileTouch(event, self.playerRelease, currentTime)
                 }
-
             }
 
             backgroundUpdate(deltaTime)
@@ -1693,6 +1692,7 @@ class Game {
                     noteRect = getPlayerNoteRect(note.index)
                 }
 
+                noteFrames = self.noteFrames
                 y = noteRect.centery
                 startY = y + int((note.time - currentTime) * scrollSpeed)
                 endY = y + int((note.end - currentTime) * scrollSpeed)
@@ -1703,7 +1703,7 @@ class Game {
                         visibleEnd = min(endY, screenHeight)
 
                         if (visibleEnd > visibleStart) {
-                            notePieceSurface = noteFrames[direction + 'HoldPiece']
+                            notePieceSurface = self.noteFrames[direction + 'HoldPiece']
                             pieceWidth, pieceHeight = notePieceSurface.get_size()
                             x = noteRect.centerx - pieceWidth // 2
                             noteLengthY = startY
@@ -1721,13 +1721,16 @@ class Game {
 
                             noteLengthY += pieceHeight
                             if (!(note.pressing && noteLengthY < y))
-                                endY = max(blitScreen(noteFrames[direction + 'HoldEnd'], [x, noteLengthY]).bottom, endY)
+                                endY = max(
+                                    blitScreen(self.noteFrames[direction + 'HoldEnd'], [x, noteLengthY]).bottom,
+                                    endY
+                                )
                         }
                     }
 
                     if (!note.pressed)
                         endY += blitScreen(
-                            noteHeadSurface := noteFrames[direction + 'Head'],
+                            noteHeadSurface := self.noteFrames[direction + 'Head'],
                             noteHeadSurface.get_rect(centerx=noteRect.centerx, centery=startY)
                         ).height // 2
                 }
@@ -1761,10 +1764,8 @@ class Game {
                     score=scoreInfo.score,
                     accuracy=scoreInfo.accuracy, rating=scoreInfo.rating,
                     combo=scoreInfo.combo, maxCombo=scoreInfo.maxCombo, comboBreaks=scoreInfo.comboBreaks,
-                    sick=scoreInfo.sick,
-                    good=scoreInfo.good,
-                    bad=scoreInfo.bad,
-                    shit=scoreInfo.shit,
+                    sick=scoreInfo.sick, good=scoreInfo.good,
+                    bad=scoreInfo.bad, shit=scoreInfo.shit,
                     miss=scoreInfo.miss
                 ),
                 (255, 255, 255),
