@@ -9,16 +9,16 @@ from fontTools.ttLib import TTFont
 from tqdm import tqdm
 from io import BytesIO
 
+PARENT_NAME = 'fnftaki'
+OUTPUT_NAME = 'taki-v2.4.0.zip'
 TARGET_SOURCES = (
     'assets', 'helpers', 'previews',
     'changelog.md', 'main.pys', 'options.pys', 'README.md', 'requirements.txt'
 )
 
-PARENT_NAME = 'fnftaki'
-OUTPUT_NAME = 'taki-v2.3.0.zip'
-
-PNG_IGNORED_CHUNKS = (b'tEXt', b'zTXt', b'iTXt', b'eXIf')
-TTF_IDS_TO_REMOVE = (0, 7, 8, 9, 10, 11, 12, 13, 14)
+PNG_IGNORED_CHUNKS = frozenset([b'tEXt', b'zTXt', b'iTXt', b'eXIf'])
+WEBP_IGNORED_CHUNKS = frozenset([b'EXIF', b'XMP ', b'ICCP'])
+TTF_IDS_TO_REMOVE = frozenset([0, 7, 8, 9, 10, 11, 12, 13, 14])
 
 def clean_png(file_path):
     try:
@@ -68,13 +68,14 @@ def clean_webp(file_path):
         while i < limit:
             if i + 8 > limit:
                 break
+
             chunk_header = data[i:i + 8]
             chunk_type = chunk_header[:4]
             chunk_size = int.from_bytes(chunk_header[4:8], 'little')
             padded_size = chunk_size + (chunk_size % 2)
             total_chunk_length = 8 + padded_size
 
-            if chunk_type not in (b'EXIF', b'XMP ', b'ICCP'):
+            if chunk_type not in WEBP_IGNORED_CHUNKS:
                 out.write(data[i:i + total_chunk_length])
 
             i += total_chunk_length

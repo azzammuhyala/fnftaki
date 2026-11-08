@@ -5,19 +5,19 @@
     <br>
     <img src="previews/Crucify - 12207.webp" alt="Preview2" height="300">
     <br>
-    <img src="previews/You Can't Run - 18143.webp" alt="Preview3" height="300">
+    <img src="previews/Madness - 8308.webp" alt="Preview3" height="300">
     <br>
-    <img src="previews/You Can't Run - 59751.webp" alt="Preview4" height="300">
+    <img src="previews/Madness - 92677.webp" alt="Preview4" height="300">
 </div>
 
 I just made **Taki** ~~VS Demon Fever~~ **FNF** using PyScript and PyGame library. This game is quite simple, with only
-14 songs and is ready to play without a main menu. If your device is quite low-end, i'm sure you won't even be able to
+15 songs and is ready to play without a main menu. If your device is quite low-end, i'm sure you won't even be able to
 reach 24 FPS (LOL). PyScript runs on top of Python also still using Tree Walk Interpreter too, which is quite slow and
 heavy for that.
 
 ## Requirements
 - Python (above `3.10.0`)
-- PyScript `pip install pyscript-programming-language` (above `1.15.0.dev1`)
+- PyScript `pip install pyscript-programming-language` (above `1.15.0`)
 - PyGame `pip install pygame` (above `2.2.0`) or `pip install pygame-ce` (above `2.1.4`)
 - NumPy `pip install numpy`
 
@@ -37,7 +37,7 @@ the Python code below. `GAME_PATH` is the game's folder, which contains the `mai
 required by the game.
 ```py
 # Game path:
-GAME_PATH = r'/storage/emulated/0/Download/taki-v2.3.0/fnftaki'
+GAME_PATH = r'/storage/emulated/0/Download/taki-v2.4.0/fnftaki'
 
 import os
 

@@ -110,10 +110,10 @@ if (BEST_PERFORMANCE) {
 pyimport('builtins').exec('def nothing(*args, **kwargs): pass', none, locals())
 
 func loadImage(path, size=none, antiAliasing=true) {
-    image = pygame.image.load(path)
+    image = pygame.image.load(path).convert_alpha()
     if (size is not none)
-        image = (antiAliasing ? pygame.transform.smoothscale : pygame.transform.scale)(image, size)
-    return image.convert_alpha()
+        image = (antiAliasing ? pygame.transform.smoothscale : pygame.transform.scale)(image, size).convert_alpha()
+    return image
 }
 
 func loadNotes(path, reverse=false) {
@@ -191,9 +191,9 @@ func renderWithLine(fontRender, text, color, backgroundColor=none, alignment='le
 
     for (textSurface of surfaces)
         y += blit(textSurface, [match (alignment) {
-            case 'left': 0,
-            case 'center': (width - textSurface.get_width()) // 2,
-            case 'right': width - textSurface.get_width()
+            'left': 0,
+            'center': (width - textSurface.get_width()) // 2,
+            'right': width - textSurface.get_width()
         }, y]).height
 
     return surface
@@ -1041,7 +1041,7 @@ class Game {
                     scoreInfo.health = self.player.data.healthMinimum
             }
         } else
-            scoreInfo.health -= self.player.data.healthAmount
+            scoreInfo.health -= self.player.data.healthAmount * 2
 
         self.updateHealth()
     }

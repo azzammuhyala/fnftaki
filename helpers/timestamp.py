@@ -27,7 +27,7 @@ import pygame
 # CONFIG
 # ==========================
 
-PATH = r"assets\songs\you cant run"
+PATH = r"assets\songs\madness"
 
 SONG = PATH + "/music.ogg"
 CHART = PATH + "/chart.csv"

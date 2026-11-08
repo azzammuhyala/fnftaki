@@ -1,0 +1,9 @@
+import csv
+
+with (open('assets/songs/madness/chart.csv') as file)
+    data = list(csv.reader(file))
+
+with (open('assets/songs/madness/chart1.csv', 'w') as file) {
+    data.sort(key=func(note) => int(note[1]))
+    file.write('\n'.join(map(','.join, data)))
+}
