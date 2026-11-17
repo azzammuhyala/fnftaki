@@ -1,6 +1,11 @@
 # Change Logs
-- Added a new song: `Madness`.
-- Optimization to several assets.
-- Failing to hit a note reduces HP by twice the previous amount.
+- The song `Come Along With Me` introduces a strum note mechanic with randomly shifting positions.
+- The song `Unknown Crucifixion` increases the scroll speed by 1.7x upon entering the intense mode.
+- A custom sprite has been added for the miss note pose in `Unknown Crucifixion` song.
+- Additional variations have been added to the miss note sound effects.
+- Several missing assets have been restored.
+- Old Taki has been moved to Classic Taki.
+- The previously required numpy library has been removed from the requirements list.
+- Enabling the `MOBILE` option now automatically activates `FULL_SCREEN` mode.
 - Fixed some bugs.
 - Etc.

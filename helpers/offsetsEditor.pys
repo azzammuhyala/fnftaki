@@ -162,11 +162,11 @@ screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 bgcolor = (255, 255, 255)
 spriteSpeed = 41
 position = [0, 0]
-state = 'idle'
+state = 'sarvd i'
 offsets = {}
 
 sprite = Sprite(
-    r'assets\images\characters\minusFever.xml',
+    r'sarv.xml',
     scale=1,
     flipX=false,
     flipY=false,

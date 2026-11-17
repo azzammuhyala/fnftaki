@@ -37,7 +37,7 @@
 
 # Available songs: 'bazinga', 'crucify', 'prayer', 'bad nun', 'feel the rage', 'bazinga anniversary',
 #                  'crucify anniversary', 'crucify sarvente', 'genocide', 'monochrome', 'markov', 'come along with me',
-#                  'unknown crucifixion', 'you cant run', 'madness' (NEW)
+#                  'unknown crucifixion', 'you cant run', 'madness'
 
 if (__name__ == '__main__')
     throw Exception("Oops! You've executed the wrong script file, try main.pys instead!")
@@ -53,7 +53,8 @@ SONG_NAME = ''
 FPS = 60
 # Show debug info:
 SHOW_INFO = 0
-# If you using on mobile ("PyramIDE: Python 3 IDE" or "Pydroid 3") change this to 1 (this makes the scroll centered):
+# If you using on mobile ("PyramIDE: Python 3 IDE" or "Pydroid 3") change this to 1 (this makes the scroll centered and
+# activates full screen mode):
 MOBILE = 0
 # If you want fullscreen:
 FULL_SCREEN = 0

@@ -90,6 +90,7 @@ SHOW_RATINGS = true
 
 if (MOBILE) {
     MIDDLE_SCROLL = true
+    FULL_SCREEN = true
 }
 if (HARD) {
     GHOST_TAPPING = false
@@ -205,7 +206,7 @@ func printScores(scoreInfo) {
     total = scoreInfo.notes
     healthPercent = scoreInfo.health * 100
     ratings = dict(comprehension(RATING_VALUES, func(rating) => (rating, format(scoreInfo[rating], ','))))
-    maximum = max(comprehension(ratings.values(), func(value) => len(value)))
+    maximum = max(comprehension(ratings.values(), len))
     ratings = jsdict.jsdict(comprehension(ratings.items(), func(rating, value) => (rating, value.rjust(maximum))))
 
     func makeBar(value, maxValue) {
@@ -872,9 +873,15 @@ class Game {
                 winning: (winning := playerIcon.split('winning')) ? winning[0] : none
             },
             healthBarColor: stage.player.character.healthBar.color,
-            vocalMiss: MISS_SOUND ? pygame.mixer.Sound(
-                stage.player.missSound ?? 'assets/sounds/defaultMiss.ogg'
-            ) : none,
+            missesVocal: MISS_SOUND ? tuple(comprehension(
+                os.listdir(missPath := stage.player.missSound ?? 'assets/sounds/misses/default'),
+                func(name) {
+                    sound = pygame.mixer.Sound(os.path.join(missPath, name))
+                    sound.set_volume(1)
+                    return sound
+                },
+                func(name) => name != '.nomedia'
+            )) : none,
             healthAmount: stage.player.healthAmount ?? 0.02,
             healthMinimum: stage.player.healthMinimum ?? 0.05,
             healthMaximum: stage.player.healthMaximum ?? 1.0,
@@ -1180,7 +1187,7 @@ class Game {
 
     func playMissSound(self) {
         if (MISS_SOUND)
-            self.player.data.vocalMiss.play()
+            random.choice(self.player.data.missesVocal).play()
     }
 
     func setPlayerVocalVolume(self, volume) {
