@@ -41,8 +41,10 @@ class Sprite {
         self.flipY = bool(flipY)
         self.antiAliasing = bool(antiAliasing)
         self.isAnimation = bool(isAnimation)
+
         self.configuration = xmlTree.parse(path).getroot()
         self.sprite = pygame.image.load(os.path.join(os.path.dirname(path), self.configuration.get('imagePath')))
+        self.cache = {}
     }
 
     func getNames(self)
@@ -85,6 +87,12 @@ class Sprite {
                 frameWidth = int(subtexture.get('frameWidth', width))
                 frameHeight = int(subtexture.get('frameHeight', height))
 
+                attributes = (x, y, width, height, frameX, frameY, frameWidth, frameHeight)
+                if (attributes -> self.cache) {
+                    frames.append((index, self.cache[attributes]))
+                    continue
+                }
+
                 frame = pygame.Surface((frameWidth, frameHeight), pygame.SRCALPHA)
                 frame.blit(self.sprite, (-frameX, -frameY), (x, y, width, height))
                 if (self.scale != 1)
@@ -92,7 +100,8 @@ class Sprite {
                 if (self.flipX || self.flipY)
                     frame = pygame.transform.flip(frame, self.flipX, self.flipY)
 
-                frames.append((index, frame.convert_alpha()))
+                self.cache[attributes] = frame = frame.convert_alpha()
+                frames.append((index, frame))
             }
         }
 
@@ -162,13 +171,19 @@ screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 bgcolor = (255, 255, 255)
 spriteSpeed = 41
 position = [0, 0]
-state = 'sarvd i'
-offsets = {}
+state = 'idle'
+offsets = {
+    'idle': (0, 0),
+    'left': (-5, 2),
+    'right': (19, 8),
+    'up': (7, -2),
+    'down': (7, 5)
+}
 
 sprite = Sprite(
-    r'sarv.xml',
+    r'assets\images\characters\limuladyAngry.xml',
     scale=1,
-    flipX=false,
+    flipX=true,
     flipY=false,
     antiAliasing=true,
     isAnimation=true

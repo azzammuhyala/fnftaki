@@ -138,7 +138,7 @@ func loadNotes(path, reverse=false) {
     notes = sorted(
         comprehension(
             enumerate(notes, start=1),
-            func (i, note) {
+            func(i, note) {
                 print(i, 'of', totalNotes, 'notes...', end='\r')
 
                 note = tuple(map(int, note))
@@ -317,8 +317,10 @@ class Sprite {
         self.flipY = bool(flipY)
         self.antiAliasing = bool(antiAliasing)
         self.isAnimation = bool(isAnimation)
+
         self.configuration = xmlTree.parse(path).getroot()
         self.sprite = pygame.image.load(os.path.join(os.path.dirname(path), self.configuration.get('imagePath')))
+        self.cache = {}
     }
 
     func getNames(self)
@@ -361,6 +363,12 @@ class Sprite {
                 frameWidth = int(subtexture.get('frameWidth', width))
                 frameHeight = int(subtexture.get('frameHeight', height))
 
+                attributes = (x, y, width, height, frameX, frameY, frameWidth, frameHeight)
+                if (attributes -> self.cache) {
+                    frames.append((index, self.cache[attributes]))
+                    continue
+                }
+
                 frame = pygame.Surface((frameWidth, frameHeight), pygame.SRCALPHA)
                 frame.blit(self.sprite, (-frameX, -frameY), (x, y, width, height))
                 if (self.scale != 1)
@@ -368,7 +376,8 @@ class Sprite {
                 if (self.flipX || self.flipY)
                     frame = pygame.transform.flip(frame, self.flipX, self.flipY)
 
-                frames.append((index, frame.convert_alpha()))
+                self.cache[attributes] = frame = frame.convert_alpha()
+                frames.append((index, frame))
             }
         }
 

@@ -12,7 +12,9 @@
 #             version); https://gamebanana.com/mods/407693 (Unknown Crucifixion);
 #             https://gamebanana.com/mods/404100 (You Can't Run - Taki version);
 #             https://www.youtube.com/watch?v=WERNsfYDJUg (Madness - Taki version), and
-#             https://gamebanana.com/mods/44334 (Tricky)
+#             https://gamebanana.com/mods/44334 (Tricky); https://www.youtube.com/watch?v=9G__jXDZ02c, and
+#             https://www.mediafire.com/file/mzz1ul5o9aiq21m/Fnf+taki+vs+limu+unknown+suffering+v3.zip/file (Unknown
+#             Suffering)
 # License mod: Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License.
 # Credit mod: Chewilly11, CesarFever, Mako, Tea, Foodieti, isophoro, Rifxii, FPLester, Biddle, BirdBonanza, Roll,
 #             Circle, HyphaeShade, Kip, Winkel, MegaFreedom, Peakek, Vai, Pancho, Della, Vortmite, EMG, Zarrene, Leo,
@@ -24,7 +26,7 @@
 #             Angelattes, AmazeinG666, Elemenopee, Direlinqqed, SadSamuraiMan, bbpanzu, MikeGeno, aus_si, P.GOD,
 #             ChromaSen, TAEYAI, RIVEREN, Yoshubs, TheDragShot, deivid36, Tern0i, Matt$, DusterBuster, Walsengipa,
 #             Electro chaos elemental, Bielms, SpeakerBossRapper_OFICIAL, LTHS02, Kyoto, Banbuds, Rozebud, Kadedev,
-#             Cval, YingYang48, JADS, Moro, Tom Fulp, Krinkels, DeveloVoosh GWeb, Tsuraran, [and more...]
+#             Cval, YingYang48, JADS, Moro, Tom Fulp, Krinkels, DeveloVoosh GWeb, Tsuraran, itsRaze, [and more...]
 
 # Source code: https://github.com/azzammuhyala/fnftaki
 # License code: MIT
@@ -37,7 +39,7 @@
 
 # Available songs: 'bazinga', 'crucify', 'prayer', 'bad nun', 'feel the rage', 'bazinga anniversary',
 #                  'crucify anniversary', 'crucify sarvente', 'genocide', 'monochrome', 'markov', 'come along with me',
-#                  'unknown crucifixion', 'you cant run', 'madness'
+#                  'unknown crucifixion', 'you cant run', 'madness', 'unknown suffering' (NEW)
 
 if (__name__ == '__main__')
     throw Exception("Oops! You've executed the wrong script file, try main.pys instead!")

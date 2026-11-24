@@ -1,11 +1,7 @@
 # Change Logs
-- The song `Come Along With Me` introduces a strum note mechanic with randomly shifting positions.
-- The song `Unknown Crucifixion` increases the scroll speed by 1.7x upon entering the intense mode.
-- A custom sprite has been added for the miss note pose in `Unknown Crucifixion` song.
-- Additional variations have been added to the miss note sound effects.
-- Several missing assets have been restored.
-- Old Taki has been moved to Classic Taki.
-- The previously required numpy library has been removed from the requirements list.
-- Enabling the `MOBILE` option now automatically activates `FULL_SCREEN` mode.
+- Added some events to the song `Prayer`.
+- Added a new song `Unknown Suffering` (with Limulady).
+- Compression of the entire `music.ogg` song file.
+- Automates the use of two or more sprite surfaces in memory.
 - Fixed some bugs.
 - Etc.

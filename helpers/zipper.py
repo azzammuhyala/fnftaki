@@ -10,7 +10,7 @@ from tqdm import tqdm
 from io import BytesIO
 
 PARENT_NAME = 'fnftaki'
-OUTPUT_NAME = 'taki-v2.4.1.zip'
+OUTPUT_NAME = 'taki-v2.5.0.zip'
 TARGET_SOURCES = (
     'assets', 'helpers', 'previews',
     'changelog.md', 'main.pys', 'options.pys', 'README.md', 'requirements.txt'
@@ -152,7 +152,7 @@ def main():
             arcname = os.path.join(PARENT_NAME, rel_path)
             ext = file_path.lower().split('.')[-1]
 
-            bar.set_postfix_str(arcname[-50:])
+            bar.set_postfix_str(arcname[-30:].rjust(30))
 
             cleaner = CLEANERS.get(ext)
             clean_data = cleaner(file_path) if cleaner else None

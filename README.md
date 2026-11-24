@@ -1,13 +1,17 @@
 # FNF Mod - Only with Taki's song (and all the covers)!!
 
 <div align="center">
-    <img src="previews/Crucify - 9150.webp" alt="Preview1" height="300">
+    <img src="previews/Crucify - 3134.webp" alt="Preview1" height="300">
     <br>
-    <img src="previews/Crucify - 21621.webp" alt="Preview2" height="300">
+    <img src="previews/Crucify - 28601.webp" alt="Preview2" height="300">
+    <br>
+    <img src="previews/Unknown Suffering - 3208.webp" alt="Preview2" height="300">
+    <br>
+    <img src="previews/Unknown Suffering - 22309.webp" alt="Preview2" height="300">
 </div>
 
 I just made **Taki** ~~VS Demon Fever~~ **FNF** using PyScript and PyGame library. This game is quite simple, with only
-15 songs and is ready to play without a main menu. If your device is quite low-end, i'm sure you won't even be able to
+16 songs and is ready to play without a main menu. If your device is quite low-end, i'm sure you won't even be able to
 reach 24 FPS (XD). PyScript runs on top of Python also still using Tree Walk Interpreter too, which is quite slow and
 heavy for that.
 
@@ -37,7 +41,7 @@ the Python code below. `GAME_PATH` is the game's folder, which contains the `mai
 required by the game.
 ```py
 # Game path:
-GAME_PATH = r'/storage/emulated/0/Download/taki-v2.4.1/fnftaki'
+GAME_PATH = r'/storage/emulated/0/Download/taki-v2.5.0/fnftaki'
 
 import os
 

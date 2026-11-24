@@ -1,11 +1,11 @@
 import json
 import re
 
-CHART_PATH = r'imported\madness-hard.json'
-RESULT_PATH = r'assets\songs\madness\chart.csv'
+CHART_PATH = r'eii\unknown-suffering-hard.json'
+RESULT_PATH = r'assets\songs\unknown suffering\chart.csv'
 EGINE = 'Psych'
 DIFFICULTY = 'hard'
-OFFSET = -300
+OFFSET = 0
 
 func load()
     with (open(CHART_PATH, 'r') as file)
